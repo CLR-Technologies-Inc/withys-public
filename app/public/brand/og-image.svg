@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#FAFAF9"></rect>
+  <circle cx="220" cy="260" r="120" fill="#D6EAF8" stroke="#637C5B" stroke-width="14"></circle>
+  <path d="M220 180 C248 195, 276 222, 276 260 C276 293, 248 327, 220 342 C192 327, 164 293, 164 260 C164 222, 192 195, 220 180 Z M220 195 L220 332" fill="#637C5B"></path>
+  <text x="380" y="240" font-family="Newsreader,Georgia,serif" font-size="88" font-weight="600" letter-spacing="-2" fill="#1A1C1C">WWLO</text>
+  <text x="380" y="300" font-family="Literata,Georgia,serif" font-style="italic" font-size="32" fill="#74796F">A markdown journal for relationships.</text>
+  <text x="380" y="340" font-family="Literata,Georgia,serif" font-style="italic" font-size="32" fill="#74796F">Remember what you talked about last.</text>
+  <text x="380" y="500" font-family="Geist,sans-serif" font-size="20" font-weight="600" fill="#637C5B" letter-spacing="3" text-transform="uppercase">WHERE WE LEFT OFF · WWLO.APP</text>
+</svg>

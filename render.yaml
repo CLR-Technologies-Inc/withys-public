@@ -1,0 +1,45 @@
+# Render Blueprint — Staging Static Site
+# Deploys the Expo web build as a static site on Render.
+# Points at the SAME production Supabase backend as Vercel.
+#
+# Usage:
+#   1. Push this repo to GitHub/GitLab (or connect via Render Dashboard)
+#   2. In Render Dashboard → New → Blueprint → select this repo
+#   3. Set environment variables (EXPO_PUBLIC_SUPABASE_URL, EXPO_PUBLIC_SUPABASE_ANON_KEY)
+#   4. Deploy
+#
+# Manual deploy (without Blueprint):
+#   Render Dashboard → New → Static Site
+#   - Root Directory: app
+#   - Build Command: npm install && npx expo export -p web
+#   - Publish Directory: dist
+#   - Add env vars from .env
+
+services:
+  - type: web
+    name: wwlo-prm-staging
+    runtime: static
+    branch: staging
+    rootDir: app
+    buildCommand: npm install && npx expo export -p web
+    staticPublishPath: dist
+    pullRequestPreviewsEnabled: true
+    headers:
+      # SPA fallback — all routes serve index.html
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /service-worker.js
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
+      - path: /_expo/static/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+    routes:
+      # SPA client-side routing — all paths fall back to index.html
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_ENV
+        value: production

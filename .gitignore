@@ -1,0 +1,36 @@
+*.env*
+node_modules
+
+# AI and Agentic Folders (ignore contents but keep folder)
+.agents/*
+!.agents/.gitkeep
+!.agents/skills/
+!.agents/tests/
+.claude/*
+!.claude/.gitkeep
+.codex/
+.cursor/
+.gemini/*
+!.gemini/.gitkeep
+
+# AI Prompt / Context files
+claude.md
+gemini.md
+devops_agent.md
+qa_agent.md
+data_agent.md
+.mcp.json
+skills-lock.json
+
+# Private Scripts
+scripts/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+#Local Private Files
+mailprocess/
+.vercel
+event.md
+ref/

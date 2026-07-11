@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 96" width="320" height="96">
+  <defs>
+    
+  </defs>
+  
+  <circle class="ring" cx="48" cy="48" r="34"></circle>
+  <path class="leaf" d="M48 26 C56 30, 64 38, 64 48 C64 56, 56 66, 48 70 C40 66, 32 56, 32 48 C32 38, 40 30, 48 26 Z M48 30 L48 66"></path>
+  
+  <text x="98" y="55" class="word">WWLO</text>
+  <text x="98" y="76" class="tag">where we left off</text>
+</svg>
