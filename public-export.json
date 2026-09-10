@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "contractIssue": "CLR-551",
+  "mode": "contract-only",
+  "sourceRepository": "CLRTechDev/prm-journal",
+  "targetRepository": "CLRTechDev/withys-public",
+  "targetBranch": "staging",
+  "inspectedSourceRevision": "5d2ffb5019ea5e241b6d4021414f7d50c1f5a73a",
+  "approvedSourceRevision": null,
+  "approvalEvidence": null,
+  "defaultOwnership": "public",
+  "unlistedPaths": "preserve",
+  "managedPaths": [
+    {
+      "source": "app/lib/idUtils.ts",
+      "target": "app/lib/idUtils.ts",
+      "owner": "private-shared",
+      "localDependencies": [],
+      "packageDependencies": [],
+      "runtimeDependencies": ["Web Crypto getRandomValues"]
+    },
+    {
+      "source": "app/lib/urlUtils.ts",
+      "target": "app/lib/urlUtils.ts",
+      "owner": "private-shared",
+      "localDependencies": [],
+      "packageDependencies": ["react-native"],
+      "runtimeDependencies": ["URL", "web alert"]
+    }
+  ],
+  "packageDependencies": {
+    "react-native": {
+      "publicVersion": "0.81.5",
+      "exportsUsed": ["Linking", "Alert", "Platform"],
+      "manifestOwner": "public",
+      "lockfile": "app/package-lock.json"
+    }
+  },
+  "publicOwnedBoundaries": [
+    "app/app/**",
+    "app/components/**",
+    "app/constants/**",
+    "app/lib/AuthProvider.tsx",
+    "app/lib/store.ts",
+    "app/lib/hooks.ts",
+    "app/lib/vault.ts",
+    "app/lib/vaultStorage.ts",
+    "app/lib/apiKeys.ts",
+    "app/lib/sampleData.ts",
+    "app/lib/__tests__/**",
+    "app/assets/**",
+    "app/public/**",
+    "app/src-tauri/**",
+    "app/package.json",
+    "app/package-lock.json",
+    ".github/**",
+    "docs/**",
+    "*.md",
+    "LICENSE",
+    "public-export.json",
+    "*.code-workspace"
+  ],
+  "excludedSourceContent": [
+    "private Git history and repository metadata",
+    "uncommitted or untracked source files",
+    "private service implementations and hosted adapters",
+    "billing forecasts and operations runbooks",
+    "customer data, secrets and deployment credentials",
+    "environment files, logs, database dumps and backups",
+    "build artifacts, source maps and dependency directories"
+  ],
+  "exportRules": {
+    "requireImmutableCommitAndApproval": true,
+    "requireDependencyClosureReview": true,
+    "requirePublicFixReconciliation": true,
+    "allowPrivateHistoryMerge": false,
+    "allowWholeRepositoryCopy": false,
+    "allowDeletionOfUnlistedPaths": false,
+    "allowSymlinksOrPathTraversal": false,
+    "allowAutomaticDependencyChanges": false,
+    "requirePublicOnlyBuildAndSecurityReview": true
+  }
+}
