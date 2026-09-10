@@ -254,8 +254,8 @@ export const useJournalStore = create<JournalState>((set, get) => ({
         new Date(b.entry_date).getTime() - new Date(a.entry_date).getTime()
       );
 
-      AsyncStorage.setItem(ENTRIES_STORAGE_KEY, JSON.stringify(nextEntries)).catch(console.error);
-      AsyncStorage.setItem(CONTACTS_STORAGE_KEY, JSON.stringify(newContacts)).catch(console.error);
+      AsyncStorage.setItem(ENTRIES_STORAGE_KEY, JSON.stringify(nextEntries)).catch(reportLocalSaveFailure);
+      AsyncStorage.setItem(CONTACTS_STORAGE_KEY, JSON.stringify(newContacts)).catch(reportLocalSaveFailure);
 
       return {
         entries: nextEntries,
@@ -271,7 +271,7 @@ export const useJournalStore = create<JournalState>((set, get) => ({
         e.id === id ? { ...e, raw_text, entry_date: raw_text.match(/^(\d{4}-\d{2}-\d{2})/)?.[1] ?? e.entry_date } : e
       );
 
-      AsyncStorage.setItem(ENTRIES_STORAGE_KEY, JSON.stringify(nextEntries)).catch(console.error);
+      AsyncStorage.setItem(ENTRIES_STORAGE_KEY, JSON.stringify(nextEntries)).catch(reportLocalSaveFailure);
 
       return {
         entries: nextEntries,
@@ -284,7 +284,7 @@ export const useJournalStore = create<JournalState>((set, get) => ({
     set((state) => {
       const nextEntries = state.entries.filter((e) => e.id !== id);
 
-      AsyncStorage.setItem(ENTRIES_STORAGE_KEY, JSON.stringify(nextEntries)).catch(console.error);
+      AsyncStorage.setItem(ENTRIES_STORAGE_KEY, JSON.stringify(nextEntries)).catch(reportLocalSaveFailure);
 
       return {
         entries: nextEntries,
@@ -299,7 +299,7 @@ export const useJournalStore = create<JournalState>((set, get) => ({
         e.id === id ? { ...e, status } : e
       );
 
-      AsyncStorage.setItem(ENTRIES_STORAGE_KEY, JSON.stringify(nextEntries)).catch(console.error);
+      AsyncStorage.setItem(ENTRIES_STORAGE_KEY, JSON.stringify(nextEntries)).catch(reportLocalSaveFailure);
 
       return {
         entries: nextEntries,
@@ -319,7 +319,7 @@ export const useJournalStore = create<JournalState>((set, get) => ({
 
     set((state) => {
       const nextContacts = [...state.contacts, newContact];
-      AsyncStorage.setItem(CONTACTS_STORAGE_KEY, JSON.stringify(nextContacts)).catch(console.error);
+      AsyncStorage.setItem(CONTACTS_STORAGE_KEY, JSON.stringify(nextContacts)).catch(reportLocalSaveFailure);
       return { contacts: nextContacts };
     });
   },
@@ -329,7 +329,7 @@ export const useJournalStore = create<JournalState>((set, get) => ({
       const nextContacts = state.contacts.map((c) =>
         c.id === id ? { ...c, ...updates } : c
       );
-      AsyncStorage.setItem(CONTACTS_STORAGE_KEY, JSON.stringify(nextContacts)).catch(console.error);
+      AsyncStorage.setItem(CONTACTS_STORAGE_KEY, JSON.stringify(nextContacts)).catch(reportLocalSaveFailure);
       return { contacts: nextContacts };
     });
   },
@@ -337,7 +337,7 @@ export const useJournalStore = create<JournalState>((set, get) => ({
   deleteContact: (id) => {
     set((state) => {
       const nextContacts = state.contacts.filter((c) => c.id !== id);
-      AsyncStorage.setItem(CONTACTS_STORAGE_KEY, JSON.stringify(nextContacts)).catch(console.error);
+      AsyncStorage.setItem(CONTACTS_STORAGE_KEY, JSON.stringify(nextContacts)).catch(reportLocalSaveFailure);
       return { contacts: nextContacts };
     });
   },
@@ -477,3 +477,13 @@ export const useJournalStore = create<JournalState>((set, get) => ({
     await AsyncStorage.setItem(ENTRIES_STORAGE_KEY, JSON.stringify(nextEntries));
   },
 }));
+
+/** Keep unsaved in-memory changes visible without logging journal content. */
+function reportLocalSaveFailure() {
+  useJournalStore.setState((state) => ({
+    sync: {
+      ...state.sync,
+      lastError: 'Changes could not be saved on this device. Keep the app open and export a backup before closing or reloading.',
+    },
+  }));
+}
