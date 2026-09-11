@@ -2,6 +2,24 @@
 
 > Default behaviors, standards, and guidelines for autonomous agents and engineers operating within this CI/CD deployment system.
 
+## Public edition owner direction (CLR-551, 2026-09-10)
+
+This scoped owner decision takes precedence over conflicting generic guidance below.
+Preserve the existing Expo app, navigation, journal/contact model, themes, local
+storage/vault boundaries and thin Tauri wrapper. Public receives at most 5% of
+total Withys token spend and 5% of total Withys dollar spend. Avoid major refactors
+and infrastructure expansion. Semgrep CI and Dependabot security maintenance are
+allowed; do not add general build/test/deployment CI. Use proportionate local
+checks. Security remains required within this budget; surface conflicts instead
+of silently exceeding the cap or accepting known security risks.
+
+Linear is authoritative for delivery tracking; GitHub PRs and community reports
+are evidence/intake. Follow [the Public ownership and export contract](docs/public-maintenance.md)
+and [the export manifest](public-export.json). Unlisted files remain Public-owned;
+an export requires an explicitly approved immutable revision and a staging PR.
+No automatic agent delegation, new schedules, source publication or production
+release is authorized by the contract.
+
 ---
 
 ## 1. Purpose and Scope

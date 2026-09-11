@@ -79,18 +79,24 @@ export function useAddEntry() {
     mutationFn: async ({ entry, encryptOnSave = false }: { entry: SampleEntry; encryptOnSave?: boolean }) => {
       const { vaultPassphrase } = useJournalStore.getState();
 
-      // Encrypt the entry if explicitly requested and vault is unlocked
-      if (encryptOnSave && vaultPassphrase) {
+      let preparedEntry = entry;
+      if (encryptOnSave) {
+        if (!vaultPassphrase) {
+          throw new Error('Unlock your vault before saving this encrypted entry.');
+        }
         try {
           const payload = await encrypt(entry.raw_text, vaultPassphrase);
-          entry.raw_text = serializeEncrypted(payload);
-        } catch (err) {
-          console.error('Encryption failed', err);
+          preparedEntry = { ...entry, raw_text: serializeEncrypted(payload) };
+        } catch {
+          throw new Error('Encryption failed. Your draft has been kept; try saving again.');
+        }
+        if (useJournalStore.getState().vaultPassphrase !== vaultPassphrase) {
+          throw new Error('Your vault changed while saving. Unlock it and try again.');
         }
       }
 
-      storeAddEntry(entry);
-      return entry;
+      storeAddEntry(preparedEntry);
+      return preparedEntry;
     },
     onSuccess: async () => {
       await Promise.all([

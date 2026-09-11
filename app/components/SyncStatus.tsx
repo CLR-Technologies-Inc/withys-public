@@ -18,14 +18,14 @@ export function SyncStatus() {
   let syncLabel = 'Synced';
   let syncColor = colors.success;
 
-  if (!sync.isOnline) {
+  if (sync.lastError) {
+    syncIcon = 'exclamation-triangle';
+    syncLabel = 'Not saved';
+    syncColor = colors.warning;
+  } else if (!sync.isOnline) {
     syncIcon = 'cloud-download';
     syncLabel = 'Offline';
     syncColor = colors.textMuted;
-  } else if (sync.lastError) {
-    syncIcon = 'exclamation-triangle';
-    syncLabel = 'Not Syncing';
-    syncColor = colors.warning;
   } else if (sync.isSyncing) {
     syncLabel = 'Syncing';
     syncColor = colors.secondaryAccent;
@@ -43,7 +43,11 @@ export function SyncStatus() {
     <View style={styles.wrapper}>
       <View style={styles.row}>
         {/* Sync pill — tappable when there's an error */}
-        <Pressable onPress={() => sync.lastError && setShowError(!showError)}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={sync.lastError ? 'Changes not saved. Show details' : syncLabel}
+          onPress={() => sync.lastError && setShowError(!showError)}
+        >
           <View style={[styles.pill, { borderColor: syncColor + '30' }]}>
             {sync.isSyncing && sync.isOnline && !sync.lastError ? (
               <ActivityIndicator size="small" color={syncColor} style={styles.spinner} />

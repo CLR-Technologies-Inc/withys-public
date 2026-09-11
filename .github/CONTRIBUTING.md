@@ -2,6 +2,12 @@
 
 Thank you for contributing! Please follow these guidelines to keep the project consistent and the CI/CD pipeline healthy.
 
+For Withys Public, the [Public maintenance contract](../docs/public-maintenance.md)
+supersedes the generic tracking/CI guidance below: Linear owns delivery tracking;
+GitHub reports are community intake and PRs provide review evidence. Retain
+Semgrep and Dependabot security maintenance, use proportionate local checks, and
+preserve the existing application structure within the 5% token/dollar budgets.
+
 ---
 
 ## Branch Strategy

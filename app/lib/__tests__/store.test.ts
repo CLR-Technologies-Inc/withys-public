@@ -12,6 +12,7 @@
  * Note: Supabase calls are mocked — we test local state transitions only.
  */
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useJournalStore } from '../store';
 import { SAMPLE_ENTRIES, SAMPLE_CONTACTS, SAMPLE_TAGS } from './mockData';
 import type { SampleEntry } from '../sampleData';
@@ -296,5 +297,25 @@ describe('useJournalStore', () => {
       useJournalStore.getState().setUserId(null);
       expect(useJournalStore.getState().userId).toBeNull();
     });
+  });
+});
+
+describe('local save failure reporting', () => {
+  it('retains an unsaved entry in memory and exposes a recovery warning while offline', async () => {
+    useJournalStore.setState({
+      entries: [], contacts: [], tags: [],
+      sync: { isOnline: false, isLoaded: true, lastError: null, isSyncing: false },
+    });
+    const entry: SampleEntry = {
+      id: 'unsaved-entry', entry_date: '2026-09-10', contact_name: 'Test Person',
+      location: '', raw_text: 'Synthetic draft', tags: [], source: 'manual', status: 'approved',
+    };
+    (AsyncStorage.setItem as jest.Mock).mockRejectedValueOnce(new Error('synthetic storage full'));
+    useJournalStore.getState().addEntry(entry);
+    await Promise.resolve();
+    expect(useJournalStore.getState().entries).toContainEqual(entry);
+    expect(useJournalStore.getState().sync.lastError).toContain('Keep the app open and export a backup');
+    expect(useJournalStore.getState().sync.lastError).not.toContain(entry.raw_text);
+    expect(useJournalStore.getState().sync.isOnline).toBe(false);
   });
 });

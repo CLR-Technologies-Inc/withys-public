@@ -2,6 +2,9 @@
 
 A self-hostable personal relationship management journal inspired by [Monica CRM](https://github.com/monicahq/monica), focused on journaling with Markdown-style entries. See [mission.md](mission.md) for the full product vision.
 
+Public maintenance and contribution rules: [ownership, workspace and export contract](docs/public-maintenance.md).
+This owner-approved contract governs Public's limited budget, security checks and Linear tracking; older cloud/pricing guidance below is pending edition cleanup.
+
 > **Current version: 0.14.0** — See [changelog.md](changelog.md) for release history.
 
 ## Why WWLO?
