@@ -267,7 +267,7 @@ export default function NewEntryModal() {
           source: 'manual',
           status: 'approved',
         },
-        encryptOnSave: encryptOnSave && vaultUnlocked,
+        encryptOnSave,
       },
       {
         onSuccess: () => {
@@ -281,6 +281,11 @@ export default function NewEntryModal() {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      {addEntryMutation.error && (
+        <Text accessibilityRole="alert" style={{ color: Colors.warning, margin: 16 }}>
+          Entry not saved. {addEntryMutation.error.message}
+        </Text>
+      )}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.headerBtn} accessibilityRole="button" accessibilityLabel="Cancel">
           <Text style={styles.cancelText}>Cancel</Text>
