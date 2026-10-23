@@ -1,0 +1,27 @@
+version = 1
+
+# Use the free Open Source plan; keep AI & Agents disabled in the dashboard.
+test_patterns = ["**/__tests__/**", "**/*.test.*", "**/*.spec.*"]
+exclude_patterns = [
+  "**/node_modules/**", "**/.expo/**", "**/dist/**",
+  "**/coverage/**", "**/target/**", "**/*.min.js"
+]
+
+[[analyzers]]
+name = "javascript"
+enabled = true
+
+  [analyzers.meta]
+  plugins = ["react"]
+  environment = ["browser", "nodejs", "jest"]
+  dialect = "typescript"
+
+[[analyzers]]
+name = "rust"
+enabled = true
+
+[[analyzers]]
+name = "docker"
+enabled = true
+
+# No AI autofix, code formatters, coverage upload, or dependency scanning.
