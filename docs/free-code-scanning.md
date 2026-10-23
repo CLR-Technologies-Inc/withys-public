@@ -14,6 +14,7 @@ top-ups are outside this setup.
 ## DeepSource
 
 1. Connect only this public repository. Preserve unrelated projects and plans.
+   Do not automatically activate newly discovered repositories.
 2. Select the free **Open Source** plan: currently 1,000 static analysis runs per
    month. Stop at the free limit rather than upgrade.
 3. Under team **Policies > AI & Agents**, turn **Enable AI Agents** off. Do not
@@ -31,8 +32,9 @@ DeepSource runs these analyzers on its service; it needs no GitHub runner job.
 
 1. Create a public project on free **SonarQube for OSS**, using the existing
    OSI-approved license. Do not start paid trials or enable paid add-ons.
-2. Connect only `CLR-Technologies-Inc/withys-public`. Preserve any existing private
-   or paid organization; use an eligible free organization for this project.
+2. Connect only `CLR-Technologies-Inc/withys-public`. Keep **Automatically import
+   new GitHub repositories** off. Preserve any existing private or paid
+   organization; use an eligible free organization for this project.
 3. Set the project's main branch to `staging`. Disable **Automatic Analysis**
    when using Actions to avoid duplicate/incompatible analysis.
 4. Set repository Actions variables `SONAR_ORGANIZATION` and `SONAR_PROJECT_KEY`
