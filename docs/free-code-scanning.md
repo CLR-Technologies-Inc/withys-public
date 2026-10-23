@@ -51,6 +51,13 @@ also excluded. No pull request event, schedule or new required check is added.
 Checkout does not fetch Private, submodules or LFS, and does not persist Git
 credentials. No application install/build/test scripts execute.
 
+The scanner installs the public application's locked npm dependencies with
+`npm ci --ignore-scripts --no-audit --no-fund --include=dev`, using pinned Node.js.
+This supplies `expo/tsconfig.base` for TypeScript analysis; dependency lifecycle
+scripts, application builds and tests do not run. Dependencies remain excluded
+from the analysis scope. The install step has a five-minute timeout and no npm
+credentials or private registry configuration.
+
 `sonar-project.properties` limits analysis to `app`, separates tests, excludes
 generated output and respects SCM exclusions. No coverage percentage is claimed
 without a coverage report. Findings apply to the public revision, not private-only
