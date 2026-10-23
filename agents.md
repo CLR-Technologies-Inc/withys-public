@@ -20,6 +20,12 @@ an export requires an explicitly approved immutable revision and a staging PR.
 No automatic agent delegation, new schedules, source publication or production
 release is authorized by the contract.
 
+Scoped owner addition (WITHYS-726, 2026-10-23): free-plan DeepSource and SonarQube
+Cloud static analysis of already-public code is authorized. Follow
+[the scanning scope and billing controls](docs/free-code-scanning.md); use standard
+GitHub runners where needed, keep paid features off, and preserve the budget,
+private-export boundaries and prohibition on general build/test/deployment CI.
+
 ---
 
 ## 1. Purpose and Scope
