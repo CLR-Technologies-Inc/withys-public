@@ -1,37 +1,56 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "contractIssue": "CLR-551",
-  "mode": "contract-only",
-  "sourceRepository": "CLRTechDev/prm-journal",
-  "targetRepository": "CLRTechDev/withys-public",
+  "mode": "id-pilot-candidate",
+  "sourceRepository": "CLR-Technologies-Inc/withys",
+  "targetRepository": "CLR-Technologies-Inc/withys-public",
   "targetBranch": "staging",
-  "inspectedSourceRevision": "5d2ffb5019ea5e241b6d4021414f7d50c1f5a73a",
-  "approvedSourceRevision": null,
-  "approvalEvidence": null,
+  "inspectedSourceRevision": "11a042c21a582f12b2e6290be244a680be134906",
+  "approvedSourceRevision": "11a042c21a582f12b2e6290be244a680be134906",
+  "approvalEvidence": {
+    "owner": "Leonard Robinson",
+    "date": "2026-10-24",
+    "scope": "Approved ID pilot hygiene repairs only; unchanged BSD-3-Clause notice, private-authoritative source, new immutable artifact and identical app pins, updated draft branches",
+    "record": "WITHYS-558",
+    "remainingGates": "No registry release, integration merge, deployment or v0.26 inclusion; existing application and security/review acceptance remains"
+  },
   "defaultOwnership": "public",
   "unlistedPaths": "preserve",
   "managedPaths": [
     {
-      "source": "app/lib/idUtils.ts",
-      "target": "app/lib/idUtils.ts",
+      "source": "packages/core/src/idUtils.ts",
+      "target": "packages/core/src/idUtils.ts",
       "owner": "private-shared",
       "localDependencies": [],
       "packageDependencies": [],
-      "runtimeDependencies": ["Web Crypto getRandomValues"]
+      "runtimeDependencies": [
+        "Web Crypto getRandomValues"
+      ],
+      "selectedForThisExport": true
     },
     {
       "source": "app/lib/urlUtils.ts",
       "target": "app/lib/urlUtils.ts",
       "owner": "private-shared",
       "localDependencies": [],
-      "packageDependencies": ["react-native"],
-      "runtimeDependencies": ["URL", "web alert"]
+      "packageDependencies": [
+        "react-native"
+      ],
+      "runtimeDependencies": [
+        "URL",
+        "web alert"
+      ],
+      "selectedForThisExport": false
     }
   ],
   "packageDependencies": {
     "react-native": {
       "publicVersion": "0.81.5",
-      "exportsUsed": ["Linking", "Alert", "Platform"],
+      "exportsUsed": [
+        "Linking",
+        "Alert",
+        "Platform"
+      ],
       "manifestOwner": "public",
       "lockfile": "app/package-lock.json"
     }
@@ -79,5 +98,85 @@
     "allowSymlinksOrPathTraversal": false,
     "allowAutomaticDependencyChanges": false,
     "requirePublicOnlyBuildAndSecurityReview": true
+  },
+  "idPilot": {
+    "baselinePublicRevision": "9200ece5b5b7c3d3e8581577114136fe32b5490c",
+    "exportFiles": [
+      {
+        "source": "packages/core/.gitattributes",
+        "target": "packages/core/.gitattributes",
+        "sha256": "a79691a93b46e49ce460c26ef22afcc03d6eca1e63bf2edbc20e96159510f6c9"
+      },
+      {
+        "source": "packages/core/.gitignore",
+        "target": "packages/core/.gitignore",
+        "sha256": "e8e70120c7fb8891ed746bb896e739a62f7f6ea1df6225461506760c146f6614"
+      },
+      {
+        "source": "packages/core/LICENSE",
+        "target": "packages/core/LICENSE",
+        "sha256": "edd1d670878434ff292c42b5652042c5d65563b559927a21e93a2433004e3f72"
+      },
+      {
+        "source": "packages/core/README.md",
+        "target": "packages/core/README.md",
+        "sha256": "6050ad049261d205837faa159d7e750c3255370c26e4e06f035bd4eaf2a234b0"
+      },
+      {
+        "source": "packages/core/package-lock.json",
+        "target": "packages/core/package-lock.json",
+        "sha256": "0b63ee647a5b167a6d9991f601daf11af4fc84d1eed6a38d3548ddff76e9b66b"
+      },
+      {
+        "source": "packages/core/package.json",
+        "target": "packages/core/package.json",
+        "sha256": "5a97d293bf40dde0e68f799e6b90c8b943e3b7714b6ccea67fb6e093b796990a"
+      },
+      {
+        "source": "packages/core/src/idUtils.ts",
+        "target": "packages/core/src/idUtils.ts",
+        "sha256": "817a3fa057e31b0a66337b99575aa34202b95c76d59afa938ae885ff1098080c"
+      },
+      {
+        "source": "packages/core/test/idUtils.test.cjs",
+        "target": "packages/core/test/idUtils.test.cjs",
+        "sha256": "274b293b654fcee0aed9f8894d263a3a42b49411bbd88d8868097c9204a0e64c"
+      },
+      {
+        "source": "packages/core/tsconfig.json",
+        "target": "packages/core/tsconfig.json",
+        "sha256": "9990fb73e706bcf8830f9a1b8a1f5ea24ab965d694ee7143788fe8fef3afb8bf"
+      }
+    ],
+    "allowlistSha256": "93ef11e46c3cb1d89714f55ef8b3ee68545662ed8c36fe27308556c43b294308",
+    "integrationFiles": [
+      "app/lib/idUtils.ts",
+      "app/package.json",
+      "app/package-lock.json",
+      "public-export.json",
+      "docs/shared-core-id-pilot.md",
+      "tools/verify-id-core.cjs",
+      "artifacts/.gitattributes",
+      "artifacts/withys-core-0.1.0-pilot.2.tgz",
+      "artifacts/withys-core-0.1.0-pilot.2.json",
+      "artifacts/withys-core-0.1.0-pilot.2.cdx.json",
+      "artifacts/withys-core-0.1.0-pilot.3.tgz",
+      "artifacts/withys-core-0.1.0-pilot.3.json",
+      "artifacts/withys-core-0.1.0-pilot.3.cdx.json"
+    ],
+    "artifactManifest": "artifacts/withys-core-0.1.0-pilot.3.json",
+    "licenseReview": {
+      "status": "owner-approved",
+      "license": "BSD-3-Clause",
+      "owner": "Leonard Robinson",
+      "date": "2026-10-24",
+      "noticeSource": "Existing Public LICENSE at baseline 9200ece5b5b7c3d3e8581577114136fe32b5490c",
+      "copyright": "Copyright (c) 2026, CLRTechDev",
+      "scope": "ID package only; no application or dependency relicensing",
+      "finding": "Narrow ID source/history and notice review found no external imports, third-party attribution or conflicting notice. AI-origin belief was not used as proof. TypeScript 5.9.3 remains Apache-2.0, build-only, and is not bundled."
+    },
+    "publicFixReconciliation": "Public package source matched the previous approved private revision; hygiene fix applied privately first and exported from immutable source; save-safety and all other Public-owned implementation paths preserved",
+    "boundaryException": "Only the named npm-format artifact is allowed build output; no source maps or other generated artifacts",
+    "validation": "Pilot.3: both 8/8 package tests, byte-identical emitted JS/declarations, 200 compatibility outputs, offline consumers, wrapper checks, rollback, repack, hashes/notices and export guards passed; revised absence assertions rejected 72 defined metadata mutations. Full app validation unrun; exact-head automatic checks pending publication."
   }
 }

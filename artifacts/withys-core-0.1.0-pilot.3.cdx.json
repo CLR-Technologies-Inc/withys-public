@@ -1,0 +1,40 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "type": "library",
+      "name": "@withys/core",
+      "version": "0.1.0-pilot.3",
+      "bom-ref": "@withys/core@0.1.0-pilot.3",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "copyright": "Copyright (c) 2026, CLRTechDev",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "ea67378fd39f68a2b47e910cff866d2f1f923b715fb187d6f2052f8137f42a58"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "@withys/core@0.1.0-pilot.3",
+      "dependsOn": []
+    }
+  ],
+  "properties": [
+    {
+      "name": "withys:scope",
+      "value": "Runtime artifact only; zero runtime dependencies. TypeScript 5.9.3 (Apache-2.0) is build-only and is not bundled."
+    }
+  ]
+}
