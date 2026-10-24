@@ -1,0 +1,30 @@
+{
+  "name": "@withys/core",
+  "version": "0.1.0-pilot.2",
+  "description": "Dependency-free ID utility pilot",
+  "private": true,
+  "license": "BSD-3-Clause",
+  "main": "dist/idUtils.js",
+  "types": "dist/idUtils.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/idUtils.d.ts",
+      "default": "./dist/idUtils.js"
+    }
+  },
+  "files": [
+    "dist/idUtils.js",
+    "dist/idUtils.d.ts",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test test/*.test.cjs",
+    "pack": "npm run build && npm pack --ignore-scripts"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}
