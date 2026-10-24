@@ -1,6 +1,6 @@
 {
   "name": "@withys/core",
-  "version": "0.1.0-pilot.2",
+  "version": "0.1.0-pilot.3",
   "description": "Dependency-free ID utility pilot",
   "private": true,
   "license": "BSD-3-Clause",

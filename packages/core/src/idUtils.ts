@@ -33,8 +33,8 @@ export function generateSecureUuid(): string {
 }
 
 export function generateSecureId(
-  length: number = 9,
-  chars: string = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  length = 9,
+  chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
 ): string {
   if (typeof globalThis.crypto?.getRandomValues !== 'function') {
     throw new Error(

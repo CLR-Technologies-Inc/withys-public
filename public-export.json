@@ -5,12 +5,12 @@
   "sourceRepository": "CLR-Technologies-Inc/withys",
   "targetRepository": "CLR-Technologies-Inc/withys-public",
   "targetBranch": "staging",
-  "inspectedSourceRevision": "b502c394f2b635fe9fb35b1cb3b870cf20d4fac5",
-  "approvedSourceRevision": "b502c394f2b635fe9fb35b1cb3b870cf20d4fac5",
+  "inspectedSourceRevision": "11a042c21a582f12b2e6290be244a680be134906",
+  "approvedSourceRevision": "11a042c21a582f12b2e6290be244a680be134906",
   "approvalEvidence": {
     "owner": "Leonard Robinson",
     "date": "2026-10-24",
-    "scope": "ID-only pilot, BSD-3-Clause using existing Public notice, matching artifact pins and selective Public draft PR publication",
+    "scope": "Approved ID pilot hygiene repairs only; unchanged BSD-3-Clause notice, private-authoritative source, new immutable artifact and identical app pins, updated draft branches",
     "record": "WITHYS-558",
     "remainingGates": "No registry release, integration merge, deployment or v0.26 inclusion; existing application and security/review acceptance remains"
   },
@@ -125,17 +125,17 @@
       {
         "source": "packages/core/package-lock.json",
         "target": "packages/core/package-lock.json",
-        "sha256": "00466081fbffcd9ff35bc47d4693de331287b6a0f96073567361639df40cfdcf"
+        "sha256": "0b63ee647a5b167a6d9991f601daf11af4fc84d1eed6a38d3548ddff76e9b66b"
       },
       {
         "source": "packages/core/package.json",
         "target": "packages/core/package.json",
-        "sha256": "dda8ccede4fb0b2f0050b8878bf9e73da1d87fe584cdcba77bcd15f68acc8e99"
+        "sha256": "5a97d293bf40dde0e68f799e6b90c8b943e3b7714b6ccea67fb6e093b796990a"
       },
       {
         "source": "packages/core/src/idUtils.ts",
         "target": "packages/core/src/idUtils.ts",
-        "sha256": "dcdc7244ffeedb39c95c30858177c70439cb6d6f437532dc008fe74c852ad737"
+        "sha256": "817a3fa057e31b0a66337b99575aa34202b95c76d59afa938ae885ff1098080c"
       },
       {
         "source": "packages/core/test/idUtils.test.cjs",
@@ -159,9 +159,12 @@
       "artifacts/.gitattributes",
       "artifacts/withys-core-0.1.0-pilot.2.tgz",
       "artifacts/withys-core-0.1.0-pilot.2.json",
-      "artifacts/withys-core-0.1.0-pilot.2.cdx.json"
+      "artifacts/withys-core-0.1.0-pilot.2.cdx.json",
+      "artifacts/withys-core-0.1.0-pilot.3.tgz",
+      "artifacts/withys-core-0.1.0-pilot.3.json",
+      "artifacts/withys-core-0.1.0-pilot.3.cdx.json"
     ],
-    "artifactManifest": "artifacts/withys-core-0.1.0-pilot.2.json",
+    "artifactManifest": "artifacts/withys-core-0.1.0-pilot.3.json",
     "licenseReview": {
       "status": "owner-approved",
       "license": "BSD-3-Clause",
@@ -172,8 +175,8 @@
       "scope": "ID package only; no application or dependency relicensing",
       "finding": "Narrow ID source/history and notice review found no external imports, third-party attribution or conflicting notice. AI-origin belief was not used as proof. TypeScript 5.9.3 remains Apache-2.0, build-only, and is not bundled."
     },
-    "publicFixReconciliation": "ID path unchanged since original Public commit; save-safety and all other Public-owned implementation paths preserved",
+    "publicFixReconciliation": "Public package source matched the previous approved private revision; hygiene fix applied privately first and exported from immutable source; save-safety and all other Public-owned implementation paths preserved",
     "boundaryException": "Only the named npm-format artifact is allowed build output; no source maps or other generated artifacts",
-    "validation": "Licensed pilot.2: 8/8 core tests in both worktrees; exact-lock offline consumer installs, wrapper types/runtime, 200 deterministic compatibility outputs, rollback, reproducible archive, approval/allowlist guards and scoped secret checks passed. Full app and existing security/review acceptance remain integration gates."
+    "validation": "Pilot.3: both 8/8 package tests, byte-identical emitted JS/declarations, 200 compatibility outputs, offline consumers, wrapper checks, rollback, repack, hashes/notices and export guards passed; revised absence assertions rejected 72 defined metadata mutations. Full app validation unrun; exact-head automatic checks pending publication."
   }
 }

@@ -16,8 +16,8 @@ of provenance. This decision applies only to the ID package; application and
 dependency licenses are unchanged. TypeScript 5.9.3 remains Apache-2.0, build-only,
 and absent from the distributed artifact.
 
-Both apps pin @withys/core 0.1.0-pilot.2 to
-file:../artifacts/withys-core-0.1.0-pilot.2.tgz with identical SHA-512 integrity.
+Both apps pin @withys/core 0.1.0-pilot.3 to
+file:../artifacts/withys-core-0.1.0-pilot.3.tgz with identical SHA-512 integrity.
 The package retains private=true to block npm registry publication. The five-file
 archive contains JavaScript, declarations, package metadata, README and LICENSE:
 zero runtime dependencies, install hooks or source maps. The runtime SBOM and
@@ -58,10 +58,22 @@ together. Existing IDs need no migration. Preserve prior artifacts and Git histo
 never reset published history. The pilot proves the export process, with no claim
 of measured CI savings.
 
-Artifact SHA-256: 09ec54a3bd566766e4ba54dd1c9908c6ff52ecaba3578218faddd7d514532532.
+Artifact SHA-256: ea67378fd39f68a2b47e910cff866d2f1f923b715fb187d6f2052f8137f42a58.
 
 Focused pilot.2 validation (2026-10-24): both 8/8 package tests, exact-lock offline
 consumer installs, wrapper types/runtime, 200 deterministic compatibility outputs,
 rollback rehearsals, byte-identical repack, approval/allowlist guards and targeted
 secret checks passed. Full application checks remain unrun. The existing Semgrep
 pull-request check is retained; no workflow or scanner was enabled or dispatched.
+
+Pilot.3 repairs the 21 introduced DeepSource hygiene findings: inferred parameter
+types, template literals, explicit Boolean conversion and assertions that require
+undefined metadata values. Emitted JavaScript and declarations are byte-identical
+to pilot.2. Prior artifact bytes remain unchanged and retained.
+
+Focused pilot.3 validation (2026-10-24): 8/8 tests in each repository; 200
+compatibility outputs; offline consumer installs, wrapper types/runtime, rollback,
+reproducible pack, export guards, hashes and notices passed. The actual verifier
+rejected 72 defined dependency/install-hook mutations, including falsy values.
+Full application validation remains unrun. Existing automatic checks are tracked
+on the published candidate; no scanner configuration or workflow changed.
