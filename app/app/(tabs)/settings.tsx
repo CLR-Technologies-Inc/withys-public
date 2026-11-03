@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Platform, Alert, type AccessibilityProps } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Platform, Alert } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import type { AccessibilityProps } from 'react-native';
 import { appearanceText } from '@/lib/appearanceText';
 
 import { useJournalStore } from '@/lib/store';

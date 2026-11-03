@@ -1,6 +1,7 @@
 import React from 'react';
 import { act, create, type ReactTestRenderer } from 'react-test-renderer';
 import { TouchableOpacity } from 'react-native';
+import { DarkColors as mockDarkColors } from '../../constants/Colors';
 import SettingsScreen from '../../app/(tabs)/settings';
 import { appearanceText } from '../appearanceText';
 import type { ThemePreference } from '../ThemeProvider';
@@ -14,7 +15,7 @@ jest.mock('react-native', () => ({
 
 const mockPreferences = { theme: 'system' as ThemePreference, dark: true, simple: false };
 jest.mock('../ThemeProvider', () => ({
-  useColors: () => require('../../constants/Colors').DarkColors,
+  useColors: () => mockDarkColors,
   useTheme: () => ({
     preference: mockPreferences.theme,
     resolvedTheme: mockPreferences.dark ? 'dark' : 'light',
@@ -32,7 +33,8 @@ jest.mock('../hooks', () => ({
   useContacts: () => ({ data: [] }),
   useAddEntry: () => ({}),
 }));
-jest.mock('../apiKeys', () => ({ getStoredApiKeys: async () => ({}) }));
+const mockStoredKeys = Promise.resolve({});
+jest.mock('../apiKeys', () => ({ getStoredApiKeys: () => mockStoredKeys }));
 jest.mock('../usePWAInstall', () => ({ usePWAInstall: () => ({}) }));
 jest.mock('expo-router', () => ({ useRouter: () => ({}) }));
 jest.mock('@expo/vector-icons/FontAwesome', () => () => null);
@@ -48,15 +50,16 @@ it('falls back per message when a bundled translation is missing or blank', () =
 
 it('exposes the current appearance settings and keeps both control actions working', async () => {
   let tree!: ReactTestRenderer;
-  await act(async () => { tree = create(<SettingsScreen />); });
+  await act(async () => {
+    tree = create(<SettingsScreen />);
+    await mockStoredKeys;
+  });
   const row = (label: string) => {
     const found = tree.root.findAllByType(TouchableOpacity).filter(node => node.props.accessibilityLabel === label);
     expect(found).toHaveLength(1);
     return found[0].props;
   };
-  const renderAgain = async () => {
-    await act(async () => { tree.update(<SettingsScreen />); });
-  };
+  const renderAgain = () => act(() => { tree.update(<SettingsScreen />); });
 
   try {
     expect(row('Editor Font').accessibilityValue.text).toBe('SpaceMono');
@@ -77,6 +80,6 @@ it('exposes the current appearance settings and keeps both control actions worki
     expect(row('Simple Mode').accessibilityState.checked).toBe(true);
     expect(row('Simple Mode').accessibilityHint).toBe('Home, Journal, People only');
   } finally {
-    await act(async () => { tree.unmount(); });
+    await act(() => { tree.unmount(); });
   }
 });
