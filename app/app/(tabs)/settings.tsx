@@ -20,7 +20,7 @@ import appJson from '../../app.json';
 interface ApiKeyConfig {
   id: string;
   label: string;
-  icon: string;
+  icon: React.ComponentProps<typeof FontAwesome>['name'];
   envVar: string;
   placeholder: string;
   helpUrl: string;
@@ -197,6 +197,7 @@ export default function SettingsScreen() {
   if (showVaultSetup) {
     const isSetup = !vaultConfigured && !vaultRestorable;
     const isRestore = !vaultConfigured && vaultRestorable;
+    const submitDisabled = !vaultPassphrase || (isSetup && !vaultConfirm);
     return (
       <View style={styles.container}>
         <View style={styles.modalHeader}>
@@ -254,9 +255,9 @@ export default function SettingsScreen() {
           )}
 
           <TouchableOpacity
-            style={[styles.vaultSubmitBtn, (!vaultPassphrase || (isSetup && !vaultConfirm)) && styles.vaultSubmitDisabled]}
+            style={[styles.vaultSubmitBtn, submitDisabled && styles.vaultSubmitDisabled]}
             onPress={isRestore ? handleVaultRestore : isSetup ? handleVaultSetup : handleVaultUnlock}
-            disabled={!vaultPassphrase || (isSetup && !vaultConfirm)}
+            disabled={submitDisabled}
           >
             <FontAwesome name={isRestore ? 'cloud-download' : isSetup ? 'shield' : 'unlock'} size={14} color="#FFFFFF" />
             <Text style={styles.vaultSubmitText}>
@@ -611,6 +612,19 @@ function ProviderKeySettings({ model, aiEnabled, onToggle }: {
   const aiStyles = useAiStyles();
   const { apiKeys, editingKey, setEditingKey, editingValue, setEditingValue, keySaveStatus,
     keyStorageReady, keyStorageError, setKeyReadAttempt, keyWriteBusy, updateKey, configuredKeyCount } = model;
+  const focusRequested = React.useRef(false);
+  const editKey = (id: string) => {
+    focusRequested.current = true;
+    setEditingKey(id);
+    setEditingValue(apiKeys[id] || '');
+  };
+  const focusEditedKey = React.useCallback((input: TextInput | null) => {
+    if (input && focusRequested.current) {
+      focusRequested.current = false;
+      input.focus();
+    }
+  }, []);
+
   return (
     <View style={styles.section}>
       <Text style={[styles.sectionTitle, { color: colors.primaryAccent }]}>AI Features</Text>
@@ -642,7 +656,7 @@ function ProviderKeySettings({ model, aiEnabled, onToggle }: {
             </TouchableOpacity>
           ) : null}
           {keyStorageReady && API_KEY_CONFIGS.map((config) => {
-            const isSaved = !!apiKeys[config.id];
+            const isSaved = Boolean(apiKeys[config.id]);
             const isEditing = editingKey === config.id;
             const status = keySaveStatus[config.id];
 
@@ -650,7 +664,7 @@ function ProviderKeySettings({ model, aiEnabled, onToggle }: {
               <View key={config.id} style={[aiStyles.keyRow, isSaved && aiStyles.keyRowSaved]}>
                 <View style={aiStyles.keyHeader}>
                   <FontAwesome
-                    name={config.icon as any}
+                    name={config.icon}
                     size={14}
                     color={isSaved ? colors.success : colors.textMuted}
                     style={aiStyles.keyIcon}
@@ -681,7 +695,7 @@ function ProviderKeySettings({ model, aiEnabled, onToggle }: {
                       onChangeText={setEditingValue}
                       placeholder={config.placeholder}
                       placeholderTextColor={colors.textMuted}
-                      autoFocus
+                      ref={focusEditedKey}
                       autoCorrect={false}
                       autoCapitalize="none"
                       editable={!keyWriteBusy}
@@ -718,7 +732,7 @@ function ProviderKeySettings({ model, aiEnabled, onToggle }: {
                   <TouchableOpacity
                     disabled={keyWriteBusy}
                     style={aiStyles.keyValueRow}
-                    onPress={() => { setEditingKey(config.id); setEditingValue(apiKeys[config.id] || ''); }}
+                    onPress={() => editKey(config.id)}
                     activeOpacity={0.7}
                   >
                     {isSaved ? (
@@ -728,7 +742,7 @@ function ProviderKeySettings({ model, aiEnabled, onToggle }: {
                           <TouchableOpacity
                             disabled={keyWriteBusy}
                             style={aiStyles.keyInlineBtn}
-                            onPress={() => { setEditingKey(config.id); setEditingValue(apiKeys[config.id] || ''); }}
+                            onPress={() => editKey(config.id)}
                             accessibilityRole="button"
                             accessibilityLabel={`Edit ${config.label} API key`}
                           >
