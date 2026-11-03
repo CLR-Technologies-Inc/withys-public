@@ -117,12 +117,12 @@ export default function SettingsScreen() {
   }, [keyReadAttempt]);
 
   const updateKey = async (keyId: string, value?: string) => {
-    if (!keyStorageReady || keyWritePending.current) return;
+    if (!keyStorageReady || keyWritePending.current || value === '') return;
     keyWritePending.current = true;
     setKeyWriteBusy(true);
-    const updated = { ...apiKeys };
-    if (value) updated[keyId] = value;
-    else delete updated[keyId];
+    const updated = value
+      ? { ...apiKeys, [keyId]: value }
+      : Object.fromEntries(Object.entries(apiKeys).filter(([id]) => id !== keyId));
     try {
       await saveStoredApiKeys(updated);
       setApiKeys(updated);
@@ -601,7 +601,7 @@ export default function SettingsScreen() {
                       <View style={aiStyles.keyEditActions}>
                         <TouchableOpacity
                           style={[aiStyles.keyActionBtn, aiStyles.keySaveBtn]}
-                          onPress={() => { if (editingValue.trim()) void updateKey(config.id, editingValue.trim()); }}
+                          onPress={() => updateKey(config.id, editingValue.trim())}
                           disabled={keyWriteBusy || !editingValue.trim()}
                         >
                           <FontAwesome name="check" size={12} color="#FFFFFF" />
@@ -648,7 +648,7 @@ export default function SettingsScreen() {
                             <TouchableOpacity
                               disabled={keyWriteBusy}
                               style={aiStyles.keyInlineBtn}
-                              onPress={() => void updateKey(config.id)}
+                              onPress={() => updateKey(config.id)}
                               accessibilityRole="button"
                               accessibilityLabel={`Remove ${config.label} API key`}
                             >

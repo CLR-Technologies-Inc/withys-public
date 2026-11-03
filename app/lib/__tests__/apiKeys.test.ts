@@ -4,8 +4,8 @@ const legacySlot = 'prm_journal_api_keys';
 const mockPlain = new Map<string, string>();
 const mockSecure = new Map<string, string>();
 let mockOS: 'web' | 'ios' | 'android' = 'web';
-const mockRead = jest.fn(async (key: string) => mockPlain.get(key) ?? null);
-const mockRemove = jest.fn(async (key: string) => { mockPlain.delete(key); });
+const mockRead = jest.fn((key: string) => Promise.resolve(mockPlain.get(key) ?? null));
+const mockRemove = jest.fn((key: string) => { mockPlain.delete(key); return Promise.resolve(); });
 
 jest.mock('react-native', () => ({ Platform: { get OS() { return mockOS; } } }));
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -13,13 +13,13 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   default: {
     getItem: mockRead,
     removeItem: mockRemove,
-    setItem: jest.fn(async (key: string, value: string) => { mockPlain.set(key, value); }),
+    setItem: jest.fn((key: string, value: string) => { mockPlain.set(key, value); return Promise.resolve(); }),
   },
 }));
 jest.mock('expo-secure-store', () => ({
-  getItemAsync: async (key: string) => mockSecure.get(key) ?? null,
-  setItemAsync: async (key: string, value: string) => { mockSecure.set(key, value); },
-  deleteItemAsync: async (key: string) => { mockSecure.delete(key); },
+  getItemAsync: (key: string) => Promise.resolve(mockSecure.get(key) ?? null),
+  setItemAsync: (key: string, value: string) => { mockSecure.set(key, value); return Promise.resolve(); },
+  deleteItemAsync: (key: string) => { mockSecure.delete(key); return Promise.resolve(); },
 }));
 
 function openApp(platform: typeof mockOS = 'web'): typeof import('../apiKeys') {
