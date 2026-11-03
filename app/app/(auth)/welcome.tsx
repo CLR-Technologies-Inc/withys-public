@@ -107,8 +107,8 @@ export default function WelcomeScreen() {
             ]}
           >
             <AppLogo size={88} />
-            <Text style={styles.brandName}>WWLO</Text>
-            <Text style={styles.brandPronunciation}>/ WIH-loh /</Text>
+            <Text style={styles.brandName}>Meadows</Text>
+            <Text style={styles.editionLabel}>Withys community edition</Text>
           </Animated.View>
 
           <Animated.View style={{ opacity: subtitleFade, alignItems: 'center' }}>
@@ -135,7 +135,7 @@ export default function WelcomeScreen() {
         {/* ── Divider ── */}
         <View style={styles.divider}>
           <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>Why WWLO?</Text>
+          <Text style={styles.dividerText}>Why Meadows?</Text>
           <View style={styles.dividerLine} />
         </View>
 
@@ -158,14 +158,14 @@ export default function WelcomeScreen() {
           <FeatureCard
             icon="bell"
             title="Reconnect Reminders"
-            description="Set your own pace for each person. WWLO gently reminds you when someone is overdue for a catch-up."
+            description="Set your own pace for each person. Meadows gently reminds you when someone is overdue for a catch-up."
             color={colors.warning}
             delay={600}
           />
           <FeatureCard
             icon="lock"
             title="Private by Design"
-            description="Your journal is yours. End-to-end encryption, local-first AI, and open-source code you can audit."
+            description="Your journal is yours. Keep your journal on this device and lock private entries in the vault."
             color={colors.secondaryAccent}
             delay={800}
           />
@@ -179,7 +179,7 @@ export default function WelcomeScreen() {
           <FeatureCard
             icon="download"
             title="Install as App"
-            description="Install WWLO directly to your home screen for a fast, app-like experience. No app store required."
+            description="Install Meadows directly to your home screen for a fast, app-like experience. No app store required."
             color="#38BDF8"
             delay={1200}
           />
@@ -279,7 +279,7 @@ function useWelcomeStyles() {
       color: colors.textPrimary,
       letterSpacing: 6,
     },
-    brandPronunciation: {
+    editionLabel: {
       fontSize: 16,
       color: colors.textMuted,
       fontStyle: 'italic',

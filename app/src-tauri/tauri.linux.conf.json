@@ -1,0 +1,46 @@
+{
+  "productName": "co.clrtechnologies.Meadows",
+  "identifier": "co.clrtechnologies.Meadows",
+  "mainBinaryName": "co.clrtechnologies.Meadows",
+  "app": {
+    "enableGTKAppId": true,
+    "windows": [
+      {
+        "title": "Withys Meadows",
+        "width": 800,
+        "height": 600,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ]
+  },
+  "bundle": {
+    "category": "Productivity",
+    "shortDescription": "Keep a personal journal of the people in your life",
+    "icon": [
+      "linux/icon.png"
+    ],
+    "linux": {
+      "deb": {
+        "desktopTemplate": "linux/co.clrtechnologies.Meadows.desktop",
+        "files": {
+          "/usr/share/metainfo/co.clrtechnologies.Meadows.metainfo.xml": "linux/co.clrtechnologies.Meadows.metainfo.xml",
+          "/usr/share/icons/hicolor/scalable/apps/co.clrtechnologies.Meadows.svg": "../public/brand/app-icon-512.svg"
+        }
+      },
+      "rpm": {
+        "desktopTemplate": "linux/co.clrtechnologies.Meadows.desktop",
+        "files": {
+          "/usr/share/metainfo/co.clrtechnologies.Meadows.metainfo.xml": "linux/co.clrtechnologies.Meadows.metainfo.xml",
+          "/usr/share/icons/hicolor/scalable/apps/co.clrtechnologies.Meadows.svg": "../public/brand/app-icon-512.svg"
+        }
+      },
+      "appimage": {
+        "files": {
+          "/usr/share/metainfo/co.clrtechnologies.Meadows.metainfo.xml": "linux/co.clrtechnologies.Meadows.metainfo.xml",
+          "/usr/share/icons/hicolor/scalable/apps/co.clrtechnologies.Meadows.svg": "../public/brand/app-icon-512.svg"
+        }
+      }
+    }
+  }
+}
