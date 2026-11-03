@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Platform, Alert } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import type { AccessibilityProps } from 'react-native';
@@ -11,16 +11,16 @@ import { isEncryptedEntry } from '@/lib/vault';
 import { useRouter } from 'expo-router';
 import { useTheme, useColors, type ThemePreference } from '@/lib/ThemeProvider';
 import { usePWAInstall } from '@/lib/usePWAInstall';
-import { type ApiKeys, getStoredApiKeys, saveStoredApiKeys } from '@/lib/apiKeys';
+import { type ApiKeys, getStoredApiKeys, saveStoredApiKeys, usesSessionOnlyApiKeys } from '@/lib/apiKeys';
 // @ts-ignore — JSON import for build-time version
 import appJson from '../../app.json';
 
-// ── API Key Storage (AsyncStorage-backed) ────────────────────────────────────
+// ── Provider Keys ────────────────────────────────────
 
 interface ApiKeyConfig {
   id: string;
   label: string;
-  icon: string;
+  icon: React.ComponentProps<typeof FontAwesome>['name'];
   envVar: string;
   placeholder: string;
   helpUrl: string;
@@ -75,6 +75,7 @@ function maskApiKey(key: string): string {
 const systemThemeLabels = { light: 'themeSystemLight', dark: 'themeSystemDark' } as const;
 
 export default function SettingsScreen() {
+  const providerKeys = useProviderKeySettings();
   const router = useRouter();
   const { vaultUnlocked, vaultConfigured, vaultRestorable, setupVault, unlockVault, restoreVault, lockVault, resetVault, aiEnabled, setAiEnabled, simpleMode, setSimpleMode } = useJournalStore();
   const { preference: themePreference, resolvedTheme, setPreference: setThemePreference } = useTheme();
@@ -89,7 +90,6 @@ export default function SettingsScreen() {
   const { isInstallable, promptInstall, isIOSWeb } = usePWAInstall();
   const colors = useColors();
   const styles = useSettingsStyles();
-  const aiStyles = useAiStyles();
   const [showImportModal, setShowImportModal] = useState(false);
   const [showVaultSetup, setShowVaultSetup] = useState(false);
   const [importText, setImportText] = useState('');
@@ -97,40 +97,6 @@ export default function SettingsScreen() {
   const [vaultPassphrase, setVaultPassphrase] = useState('');
   const [vaultConfirm, setVaultConfirm] = useState('');
   const [vaultError, setVaultError] = useState('');
-
-  // ── API Key Management State ──
-  const [apiKeys, setApiKeys] = useState<ApiKeys>({});
-  const [editingKey, setEditingKey] = useState<string | null>(null);
-  const [editingValue, setEditingValue] = useState('');
-  const [keySaveStatus, setKeySaveStatus] = useState<Record<string, 'saved' | 'error' | null>>({});
-
-  // Load persisted API keys on mount
-  useEffect(() => {
-    getStoredApiKeys().then(setApiKeys);
-  }, []);
-
-  const handleSaveKey = useCallback(async (keyId: string) => {
-    const trimmed = editingValue.trim();
-    if (!trimmed) return;
-    const updated = { ...apiKeys, [keyId]: trimmed };
-    setApiKeys(updated);
-    await saveStoredApiKeys(updated);
-    setEditingKey(null);
-    setEditingValue('');
-    setKeySaveStatus(prev => ({ ...prev, [keyId]: 'saved' }));
-    // Clear status after 3 seconds
-    setTimeout(() => setKeySaveStatus(prev => ({ ...prev, [keyId]: null })), 3000);
-  }, [editingValue, apiKeys]);
-
-  const handleClearKey = useCallback(async (keyId: string) => {
-    const updated = { ...apiKeys };
-    delete updated[keyId];
-    setApiKeys(updated);
-    await saveStoredApiKeys(updated);
-    setKeySaveStatus(prev => ({ ...prev, [keyId]: null }));
-  }, [apiKeys]);
-
-  const configuredKeyCount = API_KEY_CONFIGS.filter(c => apiKeys[c.id]).length;
 
   const vaultEntryCount = entries.filter((e) => isEncryptedEntry(e.raw_text)).length;
 
@@ -231,6 +197,7 @@ export default function SettingsScreen() {
   if (showVaultSetup) {
     const isSetup = !vaultConfigured && !vaultRestorable;
     const isRestore = !vaultConfigured && vaultRestorable;
+    const submitDisabled = !vaultPassphrase || (isSetup && !vaultConfirm);
     return (
       <View style={styles.container}>
         <View style={styles.modalHeader}>
@@ -288,9 +255,9 @@ export default function SettingsScreen() {
           )}
 
           <TouchableOpacity
-            style={[styles.vaultSubmitBtn, (!vaultPassphrase || (isSetup && !vaultConfirm)) && styles.vaultSubmitDisabled]}
+            style={[styles.vaultSubmitBtn, submitDisabled && styles.vaultSubmitDisabled]}
             onPress={isRestore ? handleVaultRestore : isSetup ? handleVaultSetup : handleVaultUnlock}
-            disabled={!vaultPassphrase || (isSetup && !vaultConfirm)}
+            disabled={submitDisabled}
           >
             <FontAwesome name={isRestore ? 'cloud-download' : isSetup ? 'shield' : 'unlock'} size={14} color="#FFFFFF" />
             <Text style={styles.vaultSubmitText}>
@@ -533,149 +500,7 @@ export default function SettingsScreen() {
         )}
       </View>
 
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.primaryAccent }]}>AI Features</Text>
-        <SettingsRow
-          icon="magic"
-          label="AI Processing Enabled"
-          subtitle={aiEnabled ? `Yes · ${configuredKeyCount} key${configuredKeyCount !== 1 ? 's' : ''} configured` : "No"}
-          subtitleColor={aiEnabled ? colors.success : undefined}
-          onPress={() => setAiEnabled(!aiEnabled)}
-          isToggle
-          toggleValue={aiEnabled}
-        />
-
-        {/* API Keys Panel — shown when AI is enabled */}
-        {aiEnabled && (
-          <View style={aiStyles.keysPanel}>
-            <View style={aiStyles.keysPanelHeader}>
-              <FontAwesome name="key" size={13} color={colors.secondaryAccent} />
-              <Text style={aiStyles.keysPanelTitle}>API Keys</Text>
-              <Text style={aiStyles.keysPanelSubtitle}>
-                {configuredKeyCount} of {API_KEY_CONFIGS.length} configured
-              </Text>
-            </View>
-
-            {API_KEY_CONFIGS.map((config) => {
-              const isSaved = !!apiKeys[config.id];
-              const isEditing = editingKey === config.id;
-              const status = keySaveStatus[config.id];
-
-              return (
-                <View key={config.id} style={[aiStyles.keyRow, isSaved && aiStyles.keyRowSaved]}>
-                  <View style={aiStyles.keyHeader}>
-                    <FontAwesome
-                      name={config.icon as any}
-                      size={14}
-                      color={isSaved ? colors.success : colors.textMuted}
-                      style={aiStyles.keyIcon}
-                    />
-                    <View style={aiStyles.keyInfo}>
-                      <Text style={aiStyles.keyLabel}>{config.label}</Text>
-                      <Text style={aiStyles.keyHelp}>{config.helpText}</Text>
-                    </View>
-                    {isSaved && !isEditing && (
-                      <View style={aiStyles.keyStatusBadge}>
-                        <FontAwesome name="check-circle" size={10} color={colors.success} />
-                        <Text style={aiStyles.keyStatusText}>Active</Text>
-                      </View>
-                    )}
-                    {status === 'saved' && (
-                      <View style={[aiStyles.keyStatusBadge, { borderColor: colors.success }]}>
-                        <FontAwesome name="check" size={10} color={colors.success} />
-                        <Text style={[aiStyles.keyStatusText, { color: colors.success }]}>Saved</Text>
-                      </View>
-                    )}
-                  </View>
-
-                  {isEditing ? (
-                    <View style={aiStyles.keyEditArea}>
-                      <TextInput
-                        style={aiStyles.keyInput}
-                        value={editingValue}
-                        onChangeText={setEditingValue}
-                        placeholder={config.placeholder}
-                        placeholderTextColor={colors.textMuted}
-                        autoFocus
-                        autoCorrect={false}
-                        autoCapitalize="none"
-                        secureTextEntry
-                      />
-                      <View style={aiStyles.keyEditActions}>
-                        <TouchableOpacity
-                          style={[aiStyles.keyActionBtn, aiStyles.keySaveBtn]}
-                          onPress={() => handleSaveKey(config.id)}
-                          disabled={!editingValue.trim()}
-                        >
-                          <FontAwesome name="check" size={12} color="#FFFFFF" />
-                          <Text style={aiStyles.keyActionText}>Save</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={[aiStyles.keyActionBtn, aiStyles.keyCancelBtn]}
-                          onPress={() => { setEditingKey(null); setEditingValue(''); }}
-                        >
-                          <Text style={[aiStyles.keyActionText, { color: colors.textMuted }]}>Cancel</Text>
-                        </TouchableOpacity>
-                      </View>
-                      <TouchableOpacity
-                        onPress={() => {
-                          if (Platform.OS === 'web') window.open(config.helpUrl, '_blank');
-                        }}
-                      >
-                        <Text style={aiStyles.keyHelpLink}>
-                          Get a key at {config.helpUrl.replace('https://', '')} →
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  ) : (
-                    <TouchableOpacity
-                      style={aiStyles.keyValueRow}
-                      onPress={() => { setEditingKey(config.id); setEditingValue(apiKeys[config.id] || ''); }}
-                      activeOpacity={0.7}
-                    >
-                      {isSaved ? (
-                        <View style={aiStyles.keyMaskedRow}>
-                          <Text style={aiStyles.keyMaskedValue}>{maskApiKey(apiKeys[config.id])}</Text>
-                          <View style={aiStyles.keyInlineActions}>
-                            <TouchableOpacity
-                              style={aiStyles.keyInlineBtn}
-                              onPress={() => { setEditingKey(config.id); setEditingValue(apiKeys[config.id] || ''); }}
-                              accessibilityRole="button"
-                              accessibilityLabel={`Edit ${config.label} API key`}
-                            >
-                              <FontAwesome name="pencil" size={11} color={colors.secondaryAccent} />
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                              style={aiStyles.keyInlineBtn}
-                              onPress={() => handleClearKey(config.id)}
-                              accessibilityRole="button"
-                              accessibilityLabel={`Remove ${config.label} API key`}
-                            >
-                              <FontAwesome name="times" size={12} color={colors.danger} />
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                      ) : (
-                        <View style={aiStyles.keyEmptyRow}>
-                          <FontAwesome name="plus-circle" size={12} color={colors.primaryAccent} />
-                          <Text style={aiStyles.keyEmptyText}>Add API key</Text>
-                        </View>
-                      )}
-                    </TouchableOpacity>
-                  )}
-                </View>
-              );
-            })}
-
-            <View style={aiStyles.keysFooter}>
-              <FontAwesome name="lock" size={11} color={colors.textMuted} />
-              <Text style={aiStyles.keysFooterText}>
-                Keys are stored locally on this device and never sent to WWLO PRM servers.
-              </Text>
-            </View>
-          </View>
-        )}
-      </View>
+      <ProviderKeySettings model={providerKeys} aiEnabled={aiEnabled} onToggle={() => setAiEnabled(!aiEnabled)} />
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.primaryAccent }]}>Billing & Usage</Text>
@@ -717,6 +542,246 @@ export default function SettingsScreen() {
         />
       </View>
     </ScrollView>
+  );
+}
+
+function useProviderKeySettings() {
+  const [apiKeys, setApiKeys] = useState<ApiKeys>({});
+  const [editingKey, setEditingKey] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState('');
+  const [keySaveStatus, setKeySaveStatus] = useState<Record<string, 'saved' | 'error' | null>>({});
+
+  const [keyStorageReady, setKeyStorageReady] = useState(false);
+  const [keyStorageError, setKeyStorageError] = useState('');
+  const [keyReadAttempt, setKeyReadAttempt] = useState(0);
+  const [keyWriteBusy, setKeyWriteBusy] = useState(false);
+  const keyWritePending = React.useRef(false);
+
+  useEffect(() => {
+    let active = true;
+    setKeyStorageError('');
+    getStoredApiKeys().then(keys => {
+      if (active) {
+        setApiKeys(keys);
+        setKeyStorageReady(true);
+      }
+    }).catch(() => {
+      if (active) setKeyStorageError('Could not prepare your provider keys. Check device storage and retry.');
+    });
+    return () => { active = false; };
+  }, [keyReadAttempt]);
+
+  const updateKey = async (keyId: string, value?: string) => {
+    if (!keyStorageReady || keyWritePending.current || value === '') return;
+    keyWritePending.current = true;
+    setKeyWriteBusy(true);
+    const updated = value
+      ? { ...apiKeys, [keyId]: value }
+      : Object.fromEntries(Object.entries(apiKeys).filter(([id]) => id !== keyId));
+    try {
+      await saveStoredApiKeys(updated);
+      setApiKeys(updated);
+      setKeyStorageError('');
+      setEditingKey(null);
+      setEditingValue('');
+      setKeySaveStatus(prev => ({ ...prev, [keyId]: value ? 'saved' : null }));
+      if (value) setTimeout(() => setKeySaveStatus(prev => ({ ...prev, [keyId]: null })), 3000);
+    } catch {
+      setKeyStorageError('Could not update your provider keys. Check device storage and try again.');
+    } finally {
+      keyWritePending.current = false;
+      setKeyWriteBusy(false);
+    }
+  };
+
+  const configuredKeyCount = API_KEY_CONFIGS.filter(c => apiKeys[c.id]).length;
+
+  return {
+    apiKeys, editingKey, setEditingKey, editingValue, setEditingValue, keySaveStatus,
+    keyStorageReady, keyStorageError, setKeyReadAttempt, keyWriteBusy, updateKey, configuredKeyCount,
+  };
+}
+
+function ProviderKeySettings({ model, aiEnabled, onToggle }: {
+  model: ReturnType<typeof useProviderKeySettings>;
+  aiEnabled: boolean;
+  onToggle: () => void;
+}) {
+  const colors = useColors();
+  const styles = useSettingsStyles();
+  const aiStyles = useAiStyles();
+  const { apiKeys, editingKey, setEditingKey, editingValue, setEditingValue, keySaveStatus,
+    keyStorageReady, keyStorageError, setKeyReadAttempt, keyWriteBusy, updateKey, configuredKeyCount } = model;
+  const focusRequested = React.useRef(false);
+  const editKey = (id: string) => {
+    focusRequested.current = true;
+    setEditingKey(id);
+    setEditingValue(apiKeys[id] || '');
+  };
+  const focusEditedKey = React.useCallback((input: TextInput | null) => {
+    if (input && focusRequested.current) {
+      focusRequested.current = false;
+      input.focus();
+    }
+  }, []);
+
+  return (
+    <View style={styles.section}>
+      <Text style={[styles.sectionTitle, { color: colors.primaryAccent }]}>AI Features</Text>
+      <SettingsRow
+        icon="magic"
+        label="AI Processing Enabled"
+        subtitle={aiEnabled ? `Yes · ${configuredKeyCount} key${configuredKeyCount !== 1 ? 's' : ''} configured` : "No"}
+        subtitleColor={aiEnabled ? colors.success : undefined}
+        onPress={onToggle}
+        isToggle
+        toggleValue={aiEnabled}
+      />
+
+      {/* API Keys Panel — shown when AI is enabled */}
+      {aiEnabled && (
+        <View style={aiStyles.keysPanel}>
+          <View style={aiStyles.keysPanelHeader}>
+            <FontAwesome name="key" size={13} color={colors.secondaryAccent} />
+            <Text style={aiStyles.keysPanelTitle}>API Keys</Text>
+            <Text style={aiStyles.keysPanelSubtitle}>
+              {configuredKeyCount} of {API_KEY_CONFIGS.length} configured
+            </Text>
+          </View>
+
+          {keyStorageError ? <Text accessibilityRole="alert" style={aiStyles.keyHelp}>{keyStorageError}</Text> : null}
+          {keyStorageError && !keyStorageReady ? (
+            <TouchableOpacity accessibilityRole="button" onPress={() => setKeyReadAttempt(attempt => attempt + 1)}>
+              <Text style={aiStyles.keyHelpLink}>Retry</Text>
+            </TouchableOpacity>
+          ) : null}
+          {keyStorageReady && API_KEY_CONFIGS.map((config) => {
+            const isSaved = Boolean(apiKeys[config.id]);
+            const isEditing = editingKey === config.id;
+            const status = keySaveStatus[config.id];
+
+            return (
+              <View key={config.id} style={[aiStyles.keyRow, isSaved && aiStyles.keyRowSaved]}>
+                <View style={aiStyles.keyHeader}>
+                  <FontAwesome
+                    name={config.icon}
+                    size={14}
+                    color={isSaved ? colors.success : colors.textMuted}
+                    style={aiStyles.keyIcon}
+                  />
+                  <View style={aiStyles.keyInfo}>
+                    <Text style={aiStyles.keyLabel}>{config.label}</Text>
+                    <Text style={aiStyles.keyHelp}>{config.helpText}</Text>
+                  </View>
+                  {isSaved && !isEditing && (
+                    <View style={aiStyles.keyStatusBadge}>
+                      <FontAwesome name="check-circle" size={10} color={colors.success} />
+                      <Text style={aiStyles.keyStatusText}>Configured</Text>
+                    </View>
+                  )}
+                  {status === 'saved' && (
+                    <View style={[aiStyles.keyStatusBadge, { borderColor: colors.success }]}>
+                      <FontAwesome name="check" size={10} color={colors.success} />
+                      <Text style={[aiStyles.keyStatusText, { color: colors.success }]}>{usesSessionOnlyApiKeys ? 'Ready for this session' : 'Saved'}</Text>
+                    </View>
+                  )}
+                </View>
+
+                {isEditing ? (
+                  <View style={aiStyles.keyEditArea}>
+                    <TextInput
+                      style={aiStyles.keyInput}
+                      value={editingValue}
+                      onChangeText={setEditingValue}
+                      placeholder={config.placeholder}
+                      placeholderTextColor={colors.textMuted}
+                      ref={focusEditedKey}
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                      editable={!keyWriteBusy}
+                      secureTextEntry
+                    />
+                    <View style={aiStyles.keyEditActions}>
+                      <TouchableOpacity
+                        style={[aiStyles.keyActionBtn, aiStyles.keySaveBtn]}
+                        onPress={() => updateKey(config.id, editingValue.trim())}
+                        disabled={keyWriteBusy || !editingValue.trim()}
+                      >
+                        <FontAwesome name="check" size={12} color="#FFFFFF" />
+                        <Text style={aiStyles.keyActionText}>{usesSessionOnlyApiKeys ? 'Use for session' : 'Save'}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        disabled={keyWriteBusy}
+                        style={[aiStyles.keyActionBtn, aiStyles.keyCancelBtn]}
+                        onPress={() => { setEditingKey(null); setEditingValue(''); }}
+                      >
+                        <Text style={[aiStyles.keyActionText, { color: colors.textMuted }]}>Cancel</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (Platform.OS === 'web') window.open(config.helpUrl, '_blank');
+                      }}
+                    >
+                      <Text style={aiStyles.keyHelpLink}>
+                        Get a key at {config.helpUrl.replace('https://', '')} →
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    disabled={keyWriteBusy}
+                    style={aiStyles.keyValueRow}
+                    onPress={() => editKey(config.id)}
+                    activeOpacity={0.7}
+                  >
+                    {isSaved ? (
+                      <View style={aiStyles.keyMaskedRow}>
+                        <Text style={aiStyles.keyMaskedValue}>{maskApiKey(apiKeys[config.id])}</Text>
+                        <View style={aiStyles.keyInlineActions}>
+                          <TouchableOpacity
+                            disabled={keyWriteBusy}
+                            style={aiStyles.keyInlineBtn}
+                            onPress={() => editKey(config.id)}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Edit ${config.label} API key`}
+                          >
+                            <FontAwesome name="pencil" size={11} color={colors.secondaryAccent} />
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            disabled={keyWriteBusy}
+                            style={aiStyles.keyInlineBtn}
+                            onPress={() => updateKey(config.id)}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Remove ${config.label} API key`}
+                          >
+                            <FontAwesome name="times" size={12} color={colors.danger} />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    ) : (
+                      <View style={aiStyles.keyEmptyRow}>
+                        <FontAwesome name="plus-circle" size={12} color={colors.primaryAccent} />
+                        <Text style={aiStyles.keyEmptyText}>Add API key</Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                )}
+              </View>
+            );
+          })}
+
+          <View style={aiStyles.keysFooter}>
+            <FontAwesome name="lock" size={11} color={colors.textMuted} />
+            <Text style={aiStyles.keysFooterText}>
+              {usesSessionOnlyApiKeys
+                ? 'Keys stay in memory for this session. Enter them again after reloading, closing the app, or signing out.'
+                : 'Keys are saved in secure storage on this device.'}
+            </Text>
+          </View>
+        </View>
+      )}
+    </View>
   );
 }
 
