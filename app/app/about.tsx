@@ -46,7 +46,7 @@ interface HelpSection {
 
 const HELP_SECTIONS: HelpSection[] = [
   {
-    title: 'What is WWLO PRM?',
+    title: 'What is Withys Meadows?',
     icon: 'book',
     content:
       'A personal relationship management tool for tracking interactions with the people in your life. ' +
@@ -108,7 +108,7 @@ const HELP_SECTIONS: HelpSection[] = [
     title: 'AI Features & Privacy',
     icon: 'magic',
     content:
-      'WWLO PRM uses AI to enhance features like sentiment analysis and transcription. You can opt out at any time in Settings.\n\n' +
+      'Withys Meadows uses AI to enhance features like sentiment analysis and transcription. You can opt out at any time in Settings.\n\n' +
       'Privacy Policy: For end-to-end encrypted entries, even with AI features turned on, you must explicitly opt in to have those entries read or processed by AI. Your private vault data stays on your device by default.',
   },
   {
@@ -138,7 +138,7 @@ const HELP_SECTIONS: HelpSection[] = [
     title: 'Your Data Responsibility',
     icon: 'exclamation-triangle',
     content:
-      'WWLO PRM is a personal relationship journal \u2014 not a secure vault for regulated data.\n\n' +
+      'Withys Meadows is a personal relationship journal \u2014 not a secure vault for regulated data.\n\n' +
       '\u26A0\uFE0F Avoid storing in plain-text entries: Social Security numbers, medical or health records, bank account numbers, tax information, or legal case details.\n\n' +
       'If you need to record sensitive information, always use the Vault encryption feature (Settings > Vault). Encrypted entries are stored as opaque blobs that cannot be read even by CLR Technologies.\n\n' +
       'Remember: you are responsible for any information you record about other people. Respect their privacy and applicable laws in your jurisdiction.',
@@ -165,7 +165,7 @@ export default function AboutScreen() {
         <View style={styles.iconCircle}>
           <FontAwesome name="book" size={28} color={Colors.secondaryAccent} />
         </View>
-        <Text style={styles.heroTitle}>WWLO PRM</Text>
+        <Text style={styles.heroTitle}>Withys Meadows</Text>
         <Text style={styles.heroVersion}>v{appJson.expo.version}</Text>
         <Text style={styles.heroTagline}>
           Personal Relationship Management

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2026 CLR Technologies Inc. -->
+<component type="desktop-application">
+  <id>co.clrtechnologies.Meadows</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>BSD-3-Clause</project_license>
+  <name>Withys Meadows</name>
+  <summary>Keep a personal journal of the people in your life</summary>
+  <developer id="co.clrtechnologies">
+    <name>CLR Technologies Inc.</name>
+  </developer>
+  <description>
+    <p>Record conversations and link journal entries to the people you spent time with.
+    Browse past entries by person or tag to pick up where you left off.</p>
+  </description>
+  <launchable type="desktop-id">co.clrtechnologies.Meadows.desktop</launchable>
+  <url type="homepage">https://github.com/CLR-Technologies-Inc/withys-public</url>
+  <url type="bugtracker">https://github.com/CLR-Technologies-Inc/withys-public/issues</url>
+  <provides>
+    <binary>co.clrtechnologies.Meadows</binary>
+  </provides>
+</component>
