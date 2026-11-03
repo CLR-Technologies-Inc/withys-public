@@ -101,3 +101,15 @@ it.each(['ios', 'android'] as const)('retains secure storage, migration and remo
   expect(mockSecure.size).toBe(0);
   expect(await app.getStoredApiKeys()).toEqual({});
 });
+
+it('preserves the active native key if cleanup prevents a replacement', async () => {
+  const existing = JSON.stringify({ gemini: 'current-fixture' });
+  mockSecure.set(legacySlot, existing);
+  mockPlain.set(legacySlot, 'old-fixture');
+  mockRemove.mockRejectedValueOnce(new Error('Storage unavailable'));
+  const app = openApp('ios');
+  await expect(app.saveStoredApiKeys({ gemini: 'replacement-fixture' })).rejects.toThrow();
+  expect(mockSecure.get(legacySlot)).toBe(existing);
+  expect(await app.getStoredApiKeys()).toEqual({ gemini: 'current-fixture' });
+  expect(mockPlain.has(legacySlot)).toBe(false);
+});

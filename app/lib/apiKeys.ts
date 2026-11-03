@@ -70,8 +70,9 @@ export async function saveStoredApiKeys(keys: ApiKeys): Promise<void> {
     return;
   }
 
+  // Finish any previous migration before changing the authoritative secure value.
+  await getStoredApiKeys();
   await secureSet(API_KEYS_STORAGE_KEY, JSON.stringify(keys));
-  await AsyncStorage.removeItem(API_KEYS_STORAGE_KEY);
 }
 
 export async function clearStoredApiKeys(): Promise<void> {

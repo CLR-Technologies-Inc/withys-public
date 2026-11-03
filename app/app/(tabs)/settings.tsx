@@ -99,6 +99,7 @@ export default function SettingsScreen() {
   const [keyStorageReady, setKeyStorageReady] = useState(false);
   const [keyStorageError, setKeyStorageError] = useState('');
   const [keyReadAttempt, setKeyReadAttempt] = useState(0);
+  const [keyWriteBusy, setKeyWriteBusy] = useState(false);
   const keyWritePending = React.useRef(false);
 
   useEffect(() => {
@@ -118,6 +119,7 @@ export default function SettingsScreen() {
   const updateKey = async (keyId: string, value?: string) => {
     if (!keyStorageReady || keyWritePending.current) return;
     keyWritePending.current = true;
+    setKeyWriteBusy(true);
     const updated = { ...apiKeys };
     if (value) updated[keyId] = value;
     else delete updated[keyId];
@@ -133,6 +135,7 @@ export default function SettingsScreen() {
       setKeyStorageError('Could not update your provider keys. Check device storage and try again.');
     } finally {
       keyWritePending.current = false;
+      setKeyWriteBusy(false);
     }
   };
 
@@ -592,18 +595,20 @@ export default function SettingsScreen() {
                         autoFocus
                         autoCorrect={false}
                         autoCapitalize="none"
+                        editable={!keyWriteBusy}
                         secureTextEntry
                       />
                       <View style={aiStyles.keyEditActions}>
                         <TouchableOpacity
                           style={[aiStyles.keyActionBtn, aiStyles.keySaveBtn]}
                           onPress={() => { if (editingValue.trim()) void updateKey(config.id, editingValue.trim()); }}
-                          disabled={!editingValue.trim()}
+                          disabled={keyWriteBusy || !editingValue.trim()}
                         >
                           <FontAwesome name="check" size={12} color="#FFFFFF" />
                           <Text style={aiStyles.keyActionText}>{usesSessionOnlyApiKeys ? 'Use for session' : 'Save'}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
+                          disabled={keyWriteBusy}
                           style={[aiStyles.keyActionBtn, aiStyles.keyCancelBtn]}
                           onPress={() => { setEditingKey(null); setEditingValue(''); }}
                         >
@@ -622,6 +627,7 @@ export default function SettingsScreen() {
                     </View>
                   ) : (
                     <TouchableOpacity
+                      disabled={keyWriteBusy}
                       style={aiStyles.keyValueRow}
                       onPress={() => { setEditingKey(config.id); setEditingValue(apiKeys[config.id] || ''); }}
                       activeOpacity={0.7}
@@ -631,6 +637,7 @@ export default function SettingsScreen() {
                           <Text style={aiStyles.keyMaskedValue}>{maskApiKey(apiKeys[config.id])}</Text>
                           <View style={aiStyles.keyInlineActions}>
                             <TouchableOpacity
+                              disabled={keyWriteBusy}
                               style={aiStyles.keyInlineBtn}
                               onPress={() => { setEditingKey(config.id); setEditingValue(apiKeys[config.id] || ''); }}
                               accessibilityRole="button"
@@ -639,6 +646,7 @@ export default function SettingsScreen() {
                               <FontAwesome name="pencil" size={11} color={colors.secondaryAccent} />
                             </TouchableOpacity>
                             <TouchableOpacity
+                              disabled={keyWriteBusy}
                               style={aiStyles.keyInlineBtn}
                               onPress={() => void updateKey(config.id)}
                               accessibilityRole="button"
