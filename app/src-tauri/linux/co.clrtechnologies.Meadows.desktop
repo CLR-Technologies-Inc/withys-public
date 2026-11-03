@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Withys Meadows
+Comment=Keep a personal journal of the people in your life
+Exec=co.clrtechnologies.Meadows
+Icon=co.clrtechnologies.Meadows
+Terminal=false
+Categories=Office;ContactManagement;
+Keywords=Journal;Contacts;Relationships;
+StartupWMClass=co.clrtechnologies.Meadows

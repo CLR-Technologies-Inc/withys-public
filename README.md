@@ -114,6 +114,10 @@ Discussed Q3 plans. He's excited about the new project.
 
 See [template_entry.md](template_entry.md) for full format documentation.
 
+## Translations
+
+The [Settings appearance pilot](docs/settings-translations.md) bundles English messages for offline use and documents a proposed Weblate component.
+
 ## License
 
 Open source — free to self-host.
