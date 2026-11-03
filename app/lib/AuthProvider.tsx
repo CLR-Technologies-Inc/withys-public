@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useJournalStore } from './store';
+import { discardLegacyBrowserApiKeys, endApiKeySession } from './apiKeys';
 
 export interface MockUser {
   id: string;
@@ -54,6 +55,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const setUserId = useJournalStore((s) => s.setUserId);
 
   useEffect(() => {
+    discardLegacyBrowserApiKeys().catch(() => {
+      // Key operations retry cleanup and surface storage failures in Settings.
+      console.warn('Provider key storage cleanup will retry on next access.');
+    });
     const loadSession = async () => {
       try {
         const loggedIn = await AsyncStorage.getItem(KEY_LOCAL_LOGGED_IN);
@@ -99,6 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       await AsyncStorage.removeItem(KEY_LOCAL_LOGGED_IN);
+      endApiKeySession();
       setSession(null);
       setUserId(null);
       return { error: null };

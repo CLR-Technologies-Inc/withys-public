@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Platform, Alert } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
@@ -9,11 +9,11 @@ import { isEncryptedEntry } from '@/lib/vault';
 import { useRouter } from 'expo-router';
 import { useTheme, useColors, type ThemePreference } from '@/lib/ThemeProvider';
 import { usePWAInstall } from '@/lib/usePWAInstall';
-import { type ApiKeys, getStoredApiKeys, saveStoredApiKeys } from '@/lib/apiKeys';
+import { type ApiKeys, getStoredApiKeys, saveStoredApiKeys, usesSessionOnlyApiKeys } from '@/lib/apiKeys';
 // @ts-ignore — JSON import for build-time version
 import appJson from '../../app.json';
 
-// ── API Key Storage (AsyncStorage-backed) ────────────────────────────────────
+// ── Provider Keys ────────────────────────────────────
 
 interface ApiKeyConfig {
   id: string;
@@ -96,31 +96,45 @@ export default function SettingsScreen() {
   const [editingValue, setEditingValue] = useState('');
   const [keySaveStatus, setKeySaveStatus] = useState<Record<string, 'saved' | 'error' | null>>({});
 
-  // Load persisted API keys on mount
+  const [keyStorageReady, setKeyStorageReady] = useState(false);
+  const [keyStorageError, setKeyStorageError] = useState('');
+  const [keyReadAttempt, setKeyReadAttempt] = useState(0);
+  const keyWritePending = React.useRef(false);
+
   useEffect(() => {
-    getStoredApiKeys().then(setApiKeys);
-  }, []);
+    let active = true;
+    setKeyStorageError('');
+    getStoredApiKeys().then(keys => {
+      if (active) {
+        setApiKeys(keys);
+        setKeyStorageReady(true);
+      }
+    }).catch(() => {
+      if (active) setKeyStorageError('Could not prepare your provider keys. Check device storage and retry.');
+    });
+    return () => { active = false; };
+  }, [keyReadAttempt]);
 
-  const handleSaveKey = useCallback(async (keyId: string) => {
-    const trimmed = editingValue.trim();
-    if (!trimmed) return;
-    const updated = { ...apiKeys, [keyId]: trimmed };
-    setApiKeys(updated);
-    await saveStoredApiKeys(updated);
-    setEditingKey(null);
-    setEditingValue('');
-    setKeySaveStatus(prev => ({ ...prev, [keyId]: 'saved' }));
-    // Clear status after 3 seconds
-    setTimeout(() => setKeySaveStatus(prev => ({ ...prev, [keyId]: null })), 3000);
-  }, [editingValue, apiKeys]);
-
-  const handleClearKey = useCallback(async (keyId: string) => {
+  const updateKey = async (keyId: string, value?: string) => {
+    if (!keyStorageReady || keyWritePending.current) return;
+    keyWritePending.current = true;
     const updated = { ...apiKeys };
-    delete updated[keyId];
-    setApiKeys(updated);
-    await saveStoredApiKeys(updated);
-    setKeySaveStatus(prev => ({ ...prev, [keyId]: null }));
-  }, [apiKeys]);
+    if (value) updated[keyId] = value;
+    else delete updated[keyId];
+    try {
+      await saveStoredApiKeys(updated);
+      setApiKeys(updated);
+      setKeyStorageError('');
+      setEditingKey(null);
+      setEditingValue('');
+      setKeySaveStatus(prev => ({ ...prev, [keyId]: value ? 'saved' : null }));
+      if (value) setTimeout(() => setKeySaveStatus(prev => ({ ...prev, [keyId]: null })), 3000);
+    } catch {
+      setKeyStorageError('Could not update your provider keys. Check device storage and try again.');
+    } finally {
+      keyWritePending.current = false;
+    }
+  };
 
   const configuredKeyCount = API_KEY_CONFIGS.filter(c => apiKeys[c.id]).length;
 
@@ -529,7 +543,13 @@ export default function SettingsScreen() {
               </Text>
             </View>
 
-            {API_KEY_CONFIGS.map((config) => {
+            {keyStorageError ? <Text accessibilityRole="alert" style={aiStyles.keyHelp}>{keyStorageError}</Text> : null}
+            {keyStorageError && !keyStorageReady ? (
+              <TouchableOpacity accessibilityRole="button" onPress={() => setKeyReadAttempt(attempt => attempt + 1)}>
+                <Text style={aiStyles.keyHelpLink}>Retry</Text>
+              </TouchableOpacity>
+            ) : null}
+            {keyStorageReady && API_KEY_CONFIGS.map((config) => {
               const isSaved = !!apiKeys[config.id];
               const isEditing = editingKey === config.id;
               const status = keySaveStatus[config.id];
@@ -550,13 +570,13 @@ export default function SettingsScreen() {
                     {isSaved && !isEditing && (
                       <View style={aiStyles.keyStatusBadge}>
                         <FontAwesome name="check-circle" size={10} color={colors.success} />
-                        <Text style={aiStyles.keyStatusText}>Active</Text>
+                        <Text style={aiStyles.keyStatusText}>Configured</Text>
                       </View>
                     )}
                     {status === 'saved' && (
                       <View style={[aiStyles.keyStatusBadge, { borderColor: colors.success }]}>
                         <FontAwesome name="check" size={10} color={colors.success} />
-                        <Text style={[aiStyles.keyStatusText, { color: colors.success }]}>Saved</Text>
+                        <Text style={[aiStyles.keyStatusText, { color: colors.success }]}>{usesSessionOnlyApiKeys ? 'Ready for this session' : 'Saved'}</Text>
                       </View>
                     )}
                   </View>
@@ -577,11 +597,11 @@ export default function SettingsScreen() {
                       <View style={aiStyles.keyEditActions}>
                         <TouchableOpacity
                           style={[aiStyles.keyActionBtn, aiStyles.keySaveBtn]}
-                          onPress={() => handleSaveKey(config.id)}
+                          onPress={() => { if (editingValue.trim()) void updateKey(config.id, editingValue.trim()); }}
                           disabled={!editingValue.trim()}
                         >
                           <FontAwesome name="check" size={12} color="#FFFFFF" />
-                          <Text style={aiStyles.keyActionText}>Save</Text>
+                          <Text style={aiStyles.keyActionText}>{usesSessionOnlyApiKeys ? 'Use for session' : 'Save'}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                           style={[aiStyles.keyActionBtn, aiStyles.keyCancelBtn]}
@@ -620,7 +640,7 @@ export default function SettingsScreen() {
                             </TouchableOpacity>
                             <TouchableOpacity
                               style={aiStyles.keyInlineBtn}
-                              onPress={() => handleClearKey(config.id)}
+                              onPress={() => void updateKey(config.id)}
                               accessibilityRole="button"
                               accessibilityLabel={`Remove ${config.label} API key`}
                             >
@@ -643,7 +663,9 @@ export default function SettingsScreen() {
             <View style={aiStyles.keysFooter}>
               <FontAwesome name="lock" size={11} color={colors.textMuted} />
               <Text style={aiStyles.keysFooterText}>
-                Keys are stored locally on this device and never sent to WWLO PRM servers.
+                {usesSessionOnlyApiKeys
+                  ? 'Keys stay in memory for this session. Enter them again after reloading, closing the app, or signing out.'
+                  : 'Keys are saved in secure storage on this device.'}
               </Text>
             </View>
           </View>
