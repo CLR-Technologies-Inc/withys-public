@@ -75,6 +75,7 @@ function maskApiKey(key: string): string {
 const systemThemeLabels = { light: 'themeSystemLight', dark: 'themeSystemDark' } as const;
 
 export default function SettingsScreen() {
+  const providerKeys = useProviderKeySettings();
   const router = useRouter();
   const { vaultUnlocked, vaultConfigured, vaultRestorable, setupVault, unlockVault, restoreVault, lockVault, resetVault, aiEnabled, setAiEnabled, simpleMode, setSimpleMode } = useJournalStore();
   const { preference: themePreference, resolvedTheme, setPreference: setThemePreference } = useTheme();
@@ -498,7 +499,7 @@ export default function SettingsScreen() {
         )}
       </View>
 
-      <ProviderKeySettings aiEnabled={aiEnabled} onToggle={() => setAiEnabled(!aiEnabled)} />
+      <ProviderKeySettings model={providerKeys} aiEnabled={aiEnabled} onToggle={() => setAiEnabled(!aiEnabled)} />
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.primaryAccent }]}>Billing & Usage</Text>
@@ -543,11 +544,7 @@ export default function SettingsScreen() {
   );
 }
 
-function ProviderKeySettings({ aiEnabled, onToggle }: { aiEnabled: boolean; onToggle: () => void }) {
-  const colors = useColors();
-  const styles = useSettingsStyles();
-  const aiStyles = useAiStyles();
-  // ── API Key Management State ──
+function useProviderKeySettings() {
   const [apiKeys, setApiKeys] = useState<ApiKeys>({});
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState('');
@@ -598,6 +595,22 @@ function ProviderKeySettings({ aiEnabled, onToggle }: { aiEnabled: boolean; onTo
 
   const configuredKeyCount = API_KEY_CONFIGS.filter(c => apiKeys[c.id]).length;
 
+  return {
+    apiKeys, editingKey, setEditingKey, editingValue, setEditingValue, keySaveStatus,
+    keyStorageReady, keyStorageError, setKeyReadAttempt, keyWriteBusy, updateKey, configuredKeyCount,
+  };
+}
+
+function ProviderKeySettings({ model, aiEnabled, onToggle }: {
+  model: ReturnType<typeof useProviderKeySettings>;
+  aiEnabled: boolean;
+  onToggle: () => void;
+}) {
+  const colors = useColors();
+  const styles = useSettingsStyles();
+  const aiStyles = useAiStyles();
+  const { apiKeys, editingKey, setEditingKey, editingValue, setEditingValue, keySaveStatus,
+    keyStorageReady, keyStorageError, setKeyReadAttempt, keyWriteBusy, updateKey, configuredKeyCount } = model;
   return (
     <View style={styles.section}>
       <Text style={[styles.sectionTitle, { color: colors.primaryAccent }]}>AI Features</Text>
