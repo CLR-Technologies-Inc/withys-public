@@ -2,7 +2,9 @@
 
 The Linux Tauri configuration names the window **Withys Meadows** and uses
 `co.clrtechnologies.Meadows` for the application ID and installed executable.
-The ID is based on the publisher's domain, clrtechnologies.co.
+The ID is based on the publisher's domain, clrtechnologies.co. Tauri 2 names
+its bundled desktop entry after `productName`, so the Linux override uses the ID
+for this filename. The desktop entry and window supply the human-readable name.
 
 For an installation from source, install the built executable on PATH with that
 name. Run `sh app/src-tauri/linux/install-desktop.sh` from the repository
