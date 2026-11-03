@@ -72,13 +72,16 @@ function maskApiKey(key: string): string {
   return key.slice(0, 6) + '••••••' + key.slice(-4);
 }
 
+const systemThemeLabels = { light: 'themeSystemLight', dark: 'themeSystemDark' } as const;
+
 export default function SettingsScreen() {
   const router = useRouter();
   const { vaultUnlocked, vaultConfigured, vaultRestorable, setupVault, unlockVault, restoreVault, lockVault, resetVault, aiEnabled, setAiEnabled, simpleMode, setSimpleMode } = useJournalStore();
   const { preference: themePreference, resolvedTheme, setPreference: setThemePreference } = useTheme();
   const themeSubtitle = themePreference === 'system'
-    ? appearanceText(resolvedTheme === 'light' ? 'themeSystemLight' : 'themeSystemDark')
+    ? appearanceText(systemThemeLabels[resolvedTheme])
     : appearanceText(themePreference === 'light' ? 'themeLight' : 'themeDark');
+  const simpleModeSubtitle = appearanceText(simpleMode ? 'simpleModeOn' : 'simpleModeOff');
   const { data: entries = [] } = useEntries();
   const { data: contacts = [] } = useContacts();
   const addEntryMutation = useAddEntry();
@@ -498,12 +501,12 @@ export default function SettingsScreen() {
         <SettingsRow
           icon="th-large"
           label={appearanceText('simpleMode')}
-          subtitle={appearanceText(simpleMode ? 'simpleModeOn' : 'simpleModeOff')}
+          subtitle={simpleModeSubtitle}
           accessibility={{
             accessibilityRole: 'switch',
             accessibilityLabel: appearanceText('simpleMode'),
             accessibilityState: { checked: simpleMode },
-            accessibilityHint: appearanceText(simpleMode ? 'simpleModeOn' : 'simpleModeOff'),
+            accessibilityHint: simpleModeSubtitle,
           }}
           onPress={() => setSimpleMode(!simpleMode)}
           isToggle
