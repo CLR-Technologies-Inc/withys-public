@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Platform, Alert, type AccessibilityProps } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { appearanceText } from '@/lib/appearanceText';
 
 import { useJournalStore } from '@/lib/store';
 import { useEntries, useAddEntry, useContacts } from '@/lib/hooks';
@@ -74,6 +75,9 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { vaultUnlocked, vaultConfigured, vaultRestorable, setupVault, unlockVault, restoreVault, lockVault, resetVault, aiEnabled, setAiEnabled, simpleMode, setSimpleMode } = useJournalStore();
   const { preference: themePreference, resolvedTheme, setPreference: setThemePreference } = useTheme();
+  const themeSubtitle = themePreference === 'system'
+    ? appearanceText(resolvedTheme === 'light' ? 'themeSystemLight' : 'themeSystemDark')
+    : appearanceText(themePreference === 'light' ? 'themeLight' : 'themeDark');
   const { data: entries = [] } = useEntries();
   const { data: contacts = [] } = useContacts();
   const addEntryMutation = useAddEntry();
@@ -463,24 +467,43 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.primaryAccent }]}>Appearance</Text>
+        <Text accessibilityRole="header" style={[styles.sectionTitle, { color: colors.primaryAccent }]}>{appearanceText('heading')}</Text>
         <SettingsRow
           icon={resolvedTheme === 'dark' ? 'moon-o' : 'sun-o'}
-          label="Theme"
-          subtitle={themePreference === 'system'
-            ? `System (${resolvedTheme})`
-            : themePreference === 'light' ? 'Light' : 'Dark'}
+          label={appearanceText('theme')}
+          subtitle={themeSubtitle}
+          accessibility={{
+            accessibilityRole: 'button',
+            accessibilityLabel: appearanceText('theme'),
+            accessibilityValue: { text: themeSubtitle },
+            accessibilityHint: appearanceText('changeThemeHint'),
+          }}
           onPress={() => {
             const cycle: ThemePreference[] = ['system', 'light', 'dark'];
             const idx = cycle.indexOf(themePreference);
             setThemePreference(cycle[(idx + 1) % cycle.length]);
           }}
         />
-        <SettingsRow icon="font" label="Editor Font" subtitle="SpaceMono" />
+        <SettingsRow
+          icon="font"
+          label={appearanceText('editorFont')}
+          subtitle="SpaceMono"
+          accessibility={{
+            accessibilityRole: 'text',
+            accessibilityLabel: appearanceText('editorFont'),
+            accessibilityValue: { text: 'SpaceMono' },
+          }}
+        />
         <SettingsRow
           icon="th-large"
-          label="Simple Mode"
-          subtitle={simpleMode ? 'Home, Journal, People only' : 'All tabs visible'}
+          label={appearanceText('simpleMode')}
+          subtitle={appearanceText(simpleMode ? 'simpleModeOn' : 'simpleModeOff')}
+          accessibility={{
+            accessibilityRole: 'switch',
+            accessibilityLabel: appearanceText('simpleMode'),
+            accessibilityState: { checked: simpleMode },
+            accessibilityHint: appearanceText(simpleMode ? 'simpleModeOn' : 'simpleModeOff'),
+          }}
           onPress={() => setSimpleMode(!simpleMode)}
           isToggle
           toggleValue={simpleMode}
@@ -693,11 +716,12 @@ export default function SettingsScreen() {
   );
 }
 
-function SettingsRow({ icon, label, subtitle, subtitleColor, onPress, danger, isToggle, toggleValue }: { icon: string; label: string; subtitle?: string; subtitleColor?: string; onPress?: () => void; danger?: boolean; isToggle?: boolean; toggleValue?: boolean; }) {
+function SettingsRow({ icon, label, subtitle, subtitleColor, onPress, danger, isToggle, toggleValue, accessibility }: { icon: string; label: string; subtitle?: string; subtitleColor?: string; onPress?: () => void; danger?: boolean; isToggle?: boolean; toggleValue?: boolean; accessibility?: AccessibilityProps; }) {
   const c = useColors();
   const styles = useSettingsStyles();
   return (
     <TouchableOpacity
+      {...accessibility}
       style={[
         styles.row,
         danger && { borderColor: 'rgba(248,113,113,0.3)' },

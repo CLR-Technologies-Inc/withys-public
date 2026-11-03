@@ -1,0 +1,13 @@
+{
+  "heading": "Appearance",
+  "theme": "Theme",
+  "themeSystemLight": "System (light)",
+  "themeSystemDark": "System (dark)",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "changeThemeHint": "Cycles between system, light and dark themes.",
+  "editorFont": "Editor Font",
+  "simpleMode": "Simple Mode",
+  "simpleModeOn": "Home, Journal, People only",
+  "simpleModeOff": "All tabs visible"
+}
