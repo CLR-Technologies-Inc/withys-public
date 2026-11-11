@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "name": "@withys/core",
+  "version": "0.1.0-pilot.2",
+  "path": "artifacts/withys-core-0.1.0-pilot.2.tgz",
+  "sha256": "09ec54a3bd566766e4ba54dd1c9908c6ff52ecaba3578218faddd7d514532532",
+  "integrity": "sha512-0P7kQEZB/vOCv51M9P0xaC+96UgHqoeRSOCVW18nOpvKEDd3pcbxXohNnJ1vrnJ/gBIwUQASVlB6fAuxreT5OA==",
+  "license": "BSD-3-Clause",
+  "copyright": "Copyright (c) 2026, CLRTechDev",
+  "distribution": "vendored npm-format draft candidate; no registry or release asset",
+  "noOverwrite": true,
+  "publicationStatus": "owner-authorized selective draft PR; integration/release gates remain",
+  "licenseReview": "Owner approved BSD-3-Clause; exact existing Public notice preserved; no specific third-party conflict found in narrow review",
+  "runtimeDependencies": [],
+  "build": {
+    "node": "24.14.1",
+    "npm": "11.11.0",
+    "typescript": "5.9.3"
+  },
+  "sourceSha256": "dcdc7244ffeedb39c95c30858177c70439cb6d6f437532dc008fe74c852ad737",
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "edd1d670878434ff292c42b5652042c5d65563b559927a21e93a2433004e3f72"
+    },
+    {
+      "path": "README.md",
+      "sha256": "6050ad049261d205837faa159d7e750c3255370c26e4e06f035bd4eaf2a234b0"
+    },
+    {
+      "path": "dist/idUtils.d.ts",
+      "sha256": "2c27e32e097d25e5a88d30bc571c75e78b32b252e88e5975728e98ab9363fdc3"
+    },
+    {
+      "path": "dist/idUtils.js",
+      "sha256": "dd760d87915fc0ccd6e2c8722cbfa107fbbdcc858b87a7235c337f81ecb84f8f"
+    },
+    {
+      "path": "package.json",
+      "sha256": "dda8ccede4fb0b2f0050b8878bf9e73da1d87fe584cdcba77bcd15f68acc8e99"
+    }
+  ]
+}
